@@ -12,19 +12,14 @@ const VitalTile = ({
   max,
   color = "#3b82f6",
 }) => {
-  // Ensure value is a number with a fallback to min
   const numValue = isNaN(parseFloat(value)) ? min : parseFloat(value);
-
-  // Calculate the percentage for the gauge (clamped between min and max)
   const percentage = Math.min(
     Math.max(((numValue - min) / (max - min)) * 100, 0),
     100
   );
 
-  // Calculate the stroke dasharray and dashoffset for circular progress
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
-  // Ensure we're not getting NaN by providing a fallback
   const strokeDashoffset = isNaN(percentage)
     ? circumference
     : circumference - (percentage / 100) * circumference;
@@ -35,9 +30,7 @@ const VitalTile = ({
         <span className="text-xl mr-2">{icon}</span>
         <h3 className="text-sm font-medium text-gray-600">{title}</h3>
       </div>
-
       <div className="relative w-36 h-36 flex items-center justify-center">
-        {/* Background circle */}
         <svg
           className="w-full h-full transform -rotate-90"
           viewBox="0 0 100 100"
@@ -50,7 +43,6 @@ const VitalTile = ({
             stroke="#f3f4f6"
             strokeWidth="5"
           />
-          {/* Progress circle with transition */}
           <circle
             cx="50"
             cy="50"
@@ -64,8 +56,6 @@ const VitalTile = ({
             style={{ transition: "stroke-dashoffset 0.8s ease-in-out" }}
           />
         </svg>
-
-        {/* Value display in center */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
           <div className="text-2xl font-bold">
             {value}
@@ -73,8 +63,6 @@ const VitalTile = ({
           </div>
         </div>
       </div>
-
-      {/* Min and max labels */}
       <div className="w-full flex justify-between mt-2">
         <span className="text-xs text-gray-500">{min}</span>
         <span className="text-xs text-gray-500">{max}</span>
@@ -85,6 +73,7 @@ const VitalTile = ({
 
 export default function RealTimeVitals({ userId }) {
   const [vitals, setVitals] = useState(null);
+  const [heartRate, setHeartRate] = useState(null);
   const [connected, setConnected] = useState(false);
   const clientRef = useRef(null);
 
@@ -101,15 +90,19 @@ export default function RealTimeVitals({ userId }) {
     );
 
     clientRef.current = client;
-    const topic = `patient/health/${userId}`;
+
+    const healthTopic = `patient/health/${userId}`;
+    const watchTopic = `watch/heart/${userId}`;
 
     client.on("connect", () => {
       setConnected(true);
-      client.subscribe(topic, (err) => {
+
+      // Subscribe to both health and watch data
+      client.subscribe([healthTopic, watchTopic], (err) => {
         if (err) console.error("Subscription error:", err);
       });
 
-      // 🔁 Publish retained message with current user ID
+      // Publish retained userId
       client.publish(
         "current/user",
         userId,
@@ -120,13 +113,17 @@ export default function RealTimeVitals({ userId }) {
         }
       );
     });
-    
+
     client.on("message", (topic, message) => {
       try {
         const data = JSON.parse(message.toString());
-        setVitals(data);
+        if (topic === healthTopic) {
+          setVitals(data);
+        } else if (topic === watchTopic && data.heartRate) {
+          setHeartRate(data.heartRate);
+        }
       } catch (err) {
-        console.error("Invalid JSON:", err);
+        console.error("Invalid JSON from topic", topic, err);
       }
     });
 
@@ -136,7 +133,7 @@ export default function RealTimeVitals({ userId }) {
 
     return () => {
       if (clientRef.current && clientRef.current.connected) {
-        clientRef.current.unsubscribe(topic, () => {
+        clientRef.current.unsubscribe([healthTopic, watchTopic], () => {
           clientRef.current.end(true);
         });
       }
@@ -168,11 +165,11 @@ export default function RealTimeVitals({ userId }) {
         <VitalTile
           icon="❤️"
           title="Heart Rate"
-          value={vitals.heartRate}
+          value={heartRate ?? "-"}
           unit="bpm"
           min={40}
           max={180}
-          color="#ef4444" // Red
+          color="#ef4444"
         />
         <VitalTile
           icon="🫁"
@@ -181,7 +178,7 @@ export default function RealTimeVitals({ userId }) {
           unit="br/min"
           min={8}
           max={30}
-          color="#8b5cf6" // Purple
+          color="#8b5cf6"
         />
         <VitalTile
           icon="🌡"
@@ -190,7 +187,7 @@ export default function RealTimeVitals({ userId }) {
           unit="°C"
           min={35}
           max={40}
-          color="#f97316" // Orange
+          color="#f97316"
         />
         <VitalTile
           icon="💨"
@@ -199,7 +196,7 @@ export default function RealTimeVitals({ userId }) {
           unit="%"
           min={80}
           max={100}
-          color="#10b981" // Green
+          color="#10b981"
         />
         <VitalTile
           icon="🩸"
@@ -208,7 +205,7 @@ export default function RealTimeVitals({ userId }) {
           unit=""
           min={90}
           max={180}
-          color="#3b82f6" // Blue
+          color="#3b82f6"
         />
         <div className="bg-white p-4 rounded-lg shadow-sm flex flex-col justify-center">
           <div className="flex items-center justify-center mb-2">
