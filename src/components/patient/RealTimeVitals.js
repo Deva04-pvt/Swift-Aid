@@ -108,8 +108,19 @@ export default function RealTimeVitals({ userId }) {
       client.subscribe(topic, (err) => {
         if (err) console.error("Subscription error:", err);
       });
-    });
 
+      // 🔁 Publish retained message with current user ID
+      client.publish(
+        "current/user",
+        userId,
+        { retain: true, qos: 1 },
+        (err) => {
+          if (err) console.error("Publish error:", err);
+          else console.log("Published retained userId");
+        }
+      );
+    });
+    
     client.on("message", (topic, message) => {
       try {
         const data = JSON.parse(message.toString());
