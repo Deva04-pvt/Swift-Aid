@@ -3,25 +3,55 @@ import { useState, useEffect } from "react";
 
 export default function SOSSection({ userId }) {
   const [emergencyContact, setEmergencyContact] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [userCredentials, setUserCredentials] = useState(null);
   const [selectedSpecialties, setSelectedSpecialties] = useState([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchContact = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`/api/emergency-contact?userId=${userId}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message);
-        setEmergencyContact(data.emergencyContact);
+        // Create an array of promises for parallel fetching
+        const promises = [
+          // Fetch emergency contact
+          fetch(`/api/emergency-contact?userId=${userId}`).then((res) =>
+            res.json()
+          ),
+          // Fetch user profile
+          fetch(`/api/patient/profile?userId=${userId}`).then((res) =>
+            res.json()
+          ),
+          // Fetch user credentials for name
+          fetch(`/api/user/credentials?userId=${userId}`).then((res) =>
+            res.json()
+          ),
+        ];
+
+        // Wait for all promises to resolve
+        const [contactData, profileData, credentialsData] = await Promise.all(
+          promises
+        );
+
+        // Check and set data
+        if (contactData.error)
+          throw new Error(contactData.message || contactData.error);
+        setEmergencyContact(contactData.emergencyContact);
+
+        if (profileData.error) throw new Error(profileData.error);
+        setUserProfile(profileData.profile);
+
+        if (credentialsData.error) throw new Error(credentialsData.error);
+        setUserCredentials(credentialsData.user);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || "Failed to fetch data");
       } finally {
         setLoading(false);
       }
     };
-    if (userId) fetchContact();
+
+    if (userId) fetchData();
   }, [userId]);
 
   const getCurrentLocation = () => {
@@ -32,18 +62,77 @@ export default function SOSSection({ userId }) {
     });
   };
 
+  const generateProfileQRCode = async () => {
+    if (!userProfile) return null;
+
+    // Get user's name from credentials
+    const firstName = userCredentials?.firstName || "Unknown";
+    const lastName = userCredentials?.lastName || "";
+
+    // Format profile data as colon-separated values - using correct property names from your data
+    const profileLines = [
+      `Name: ${firstName} ${lastName}`,
+      `DOB: ${new Date(userProfile.dateOfBirth).toLocaleDateString() || "N/A"}`,
+      `Blood Group: ${userProfile.bloodGroup || "N/A"}`,
+      `Gender: ${userProfile.gender || "N/A"}`,
+      `Contact: ${userProfile.contactNumber || "N/A"}`,
+      `Emergency Contact: ${
+        userProfile.emergencyContact?.name || emergencyContact?.name || "N/A"
+      } (${
+        userProfile.emergencyContact?.phone || emergencyContact?.phone || "N/A"
+      })`,
+      `Relation: ${userProfile.emergencyContact?.relation || "N/A"}`,
+      `Allergies: ${userProfile.allergies?.join(", ") || "None"}`,
+      `Medical History: ${userProfile.medicalHistory?.join(", ") || "None"}`,
+      `Current Medications: ${
+        userProfile.currentMedications?.join(", ") || "None"
+      }`,
+      `Insurance: ${userProfile.insuranceProvider || "N/A"} - ${
+        userProfile.insuranceNumber || "N/A"
+      }`,
+      `Address: ${userProfile.address?.street || ""}, ${
+        userProfile.address?.city || ""
+      }, ${userProfile.address?.state || ""}, ${
+        userProfile.address?.country || ""
+      } ${userProfile.address?.zip || ""}`,
+    ].join("\n");
+
+    // Generate QR code URL using a free API service
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+      profileLines
+    )}`;
+
+    return qrCodeUrl;
+  };
+
   const sendSOS = async () => {
     try {
       const pos = await getCurrentLocation();
       const { latitude, longitude } = pos.coords;
-      const link = `https://www.google.com/maps?q=${latitude},${longitude}`;
-      const msg = `🚨 Emergency! I need help. Here's my location: ${link}`;
-      const url = `https://api.whatsapp.com/send?phone=${
-        emergencyContact.phone
+      const locationLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+      // Get user's name for the message
+      const name = userCredentials
+        ? `${userCredentials.firstName} ${userCredentials.lastName}`
+        : "A patient";
+
+      // Generate QR code with medical data
+      const qrCodeUrl = await generateProfileQRCode();
+
+      // Build message with name, location and QR code link
+      let msg = `🚨 EMERGENCY! ${name} needs help. Location: ${locationLink}`;
+
+      if (qrCodeUrl) {
+        msg += `\n\nScan this QR code for medical information: ${qrCodeUrl}`;
+      }
+
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${
+        emergencyContact?.phone || userProfile?.emergencyContact?.phone
       }&text=${encodeURIComponent(msg)}`;
-      window.open(url, "_blank");
+
+      window.open(whatsappUrl, "_blank");
     } catch (err) {
-      setError(err.message);
+      setError(typeof err === "string" ? err : err.message);
     }
   };
 
@@ -70,7 +159,7 @@ export default function SOSSection({ userId }) {
     }
   };
 
-  if (loading) return <p>Loading emergency contact...</p>;
+  if (loading) return <p>Loading emergency information...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
@@ -79,12 +168,18 @@ export default function SOSSection({ userId }) {
         🚨 SOS & Hospital Finder
       </h2>
 
-      <button
-        onClick={sendSOS}
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Send SOS
-      </button>
+      <div className="mb-4">
+        <p className="text-sm mb-2">
+          Pressing the SOS button will send your current location and medical
+          profile QR code to your emergency contact via WhatsApp.
+        </p>
+        <button
+          onClick={sendSOS}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow"
+        >
+          Send SOS with Medical Profile
+        </button>
+      </div>
 
       <div className="mt-6">
         <button
