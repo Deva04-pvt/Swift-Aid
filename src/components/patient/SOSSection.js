@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-export default function SOSSection({ userId }) {
+const SOSSection = ({ userId }) => {
   const [emergencyContact, setEmergencyContact] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [userCredentials, setUserCredentials] = useState(null);
@@ -9,32 +9,27 @@ export default function SOSSection({ userId }) {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isCallingEmergency, setIsCallingEmergency] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Create an array of promises for parallel fetching
         const promises = [
-          // Fetch emergency contact
           fetch(`/api/emergency-contact?userId=${userId}`).then((res) =>
             res.json()
           ),
-          // Fetch user profile
           fetch(`/api/patient/profile?userId=${userId}`).then((res) =>
             res.json()
           ),
-          // Fetch user credentials for name
           fetch(`/api/user/credentials?userId=${userId}`).then((res) =>
             res.json()
           ),
         ];
 
-        // Wait for all promises to resolve
         const [contactData, profileData, credentialsData] = await Promise.all(
           promises
         );
 
-        // Check and set data
         if (contactData.error)
           throw new Error(contactData.message || contactData.error);
         setEmergencyContact(contactData.emergencyContact);
@@ -65,11 +60,9 @@ export default function SOSSection({ userId }) {
   const generateProfileQRCode = async () => {
     if (!userProfile) return null;
 
-    // Get user's name from credentials
     const firstName = userCredentials?.firstName || "Unknown";
     const lastName = userCredentials?.lastName || "";
 
-    // Format profile data as colon-separated values - using correct property names from your data
     const profileLines = [
       `Name: ${firstName} ${lastName}`,
       `DOB: ${new Date(userProfile.dateOfBirth).toLocaleDateString() || "N/A"}`,
@@ -97,12 +90,42 @@ export default function SOSSection({ userId }) {
       } ${userProfile.address?.zip || ""}`,
     ].join("\n");
 
-    // Generate QR code URL using a free API service
     const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
       profileLines
     )}`;
 
     return qrCodeUrl;
+  };
+
+  const initiateEmergencyCall = async (location) => {
+    try {
+      setIsCallingEmergency(true);
+
+      const res = await fetch("/api/sos-call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: emergencyContact?.phone || "09513886363",
+          userName: `${userCredentials?.firstName} ${userCredentials?.lastName}`,
+          location: location,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error);
+
+      alert(
+        "Emergency services have been notified. Stay calm, help is on the way."
+      );
+    } catch (error) {
+      console.error("Emergency call failed:", error);
+      alert(
+        "Failed to contact emergency services. Please try again or call directly."
+      );
+    } finally {
+      setIsCallingEmergency(false);
+    }
   };
 
   const sendSOS = async () => {
@@ -111,15 +134,14 @@ export default function SOSSection({ userId }) {
       const { latitude, longitude } = pos.coords;
       const locationLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
 
-      // Get user's name for the message
+      await initiateEmergencyCall(locationLink);
+
       const name = userCredentials
         ? `${userCredentials.firstName} ${userCredentials.lastName}`
         : "A patient";
 
-      // Generate QR code with medical data
       const qrCodeUrl = await generateProfileQRCode();
 
-      // Build message with name, location and QR code link
       let msg = `🚨 EMERGENCY! ${name} needs help. Location: ${locationLink}`;
 
       if (qrCodeUrl) {
@@ -175,9 +197,35 @@ export default function SOSSection({ userId }) {
         </p>
         <button
           onClick={sendSOS}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow"
+          disabled={isCallingEmergency}
+          className={`
+            w-full bg-red-500 hover:bg-red-700 text-white font-bold 
+            py-3 px-6 rounded-lg shadow transition-colors
+            ${isCallingEmergency ? "opacity-75 cursor-not-allowed" : ""}
+          `}
         >
-          Send SOS with Medical Profile
+          {isCallingEmergency ? (
+            <div className="flex items-center justify-center">
+              <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              Contacting Emergency Services...
+            </div>
+          ) : (
+            "Send SOS with Emergency Call"
+          )}
         </button>
       </div>
 
@@ -221,4 +269,6 @@ export default function SOSSection({ userId }) {
       </div>
     </div>
   );
-}
+};
+
+export default SOSSection;
