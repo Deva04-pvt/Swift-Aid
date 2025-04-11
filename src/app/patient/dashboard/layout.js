@@ -25,6 +25,7 @@ const navItems = [
     section: "Remote Monitoring",
     links: [
       { name: "Vitals Dashboard", path: "/patient/dashboard/monitoring" },
+      { name: "Response History", path: "/patient/dashboard/history" },
     ],
   },
 ];
