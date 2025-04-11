@@ -1,5 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
+import {
+  AlertTriangle,
+  MapPin,
+  Phone,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  Loader2,
+} from "lucide-react";
 
 export default function SOSSection({ userId }) {
   const [emergencyContact, setEmergencyContact] = useState(null);
@@ -9,21 +18,19 @@ export default function SOSSection({ userId }) {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Create an array of promises for parallel fetching
         const promises = [
-          // Fetch emergency contact
           fetch(`/api/emergency-contact?userId=${userId}`).then((res) =>
             res.json()
           ),
-          // Fetch user profile
           fetch(`/api/patient/profile?userId=${userId}`).then((res) =>
             res.json()
           ),
-          // Fetch user credentials for name
           fetch(`/api/user/credentials?userId=${userId}`).then((res) =>
             res.json()
           ),
@@ -69,7 +76,7 @@ export default function SOSSection({ userId }) {
     const firstName = userCredentials?.firstName || "Unknown";
     const lastName = userCredentials?.lastName || "";
 
-    // Format profile data as colon-separated values - using correct property names from your data
+    // Format profile data as colon-separated values
     const profileLines = [
       `Name: ${firstName} ${lastName}`,
       `DOB: ${new Date(userProfile.dateOfBirth).toLocaleDateString() || "N/A"}`,
@@ -106,7 +113,11 @@ export default function SOSSection({ userId }) {
   };
 
   const sendSOS = async () => {
+    if (sending) return;
+
     try {
+      setSending(true);
+
       const pos = await getCurrentLocation();
       const { latitude, longitude } = pos.coords;
       const locationLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
@@ -133,91 +144,84 @@ export default function SOSSection({ userId }) {
       window.open(whatsappUrl, "_blank");
     } catch (err) {
       setError(typeof err === "string" ? err : err.message);
+    } finally {
+      setSending(false);
     }
   };
 
-  const handleCheckbox = (value, checked) => {
-    setSelectedSpecialties((prev) =>
-      checked ? [...prev, value] : prev.filter((item) => item !== value)
+  if (loading) {
+    return (
+      <div className="text-center p-4">
+        <Loader2 className="h-8 w-8 animate-spin mx-auto text-red-500" />
+        <p className="mt-2 text-gray-600">Loading emergency information...</p>
+      </div>
     );
-  };
+  }
 
-  const findHospitals = async () => {
-    try {
-      if (selectedSpecialties.length === 0) {
-        alert("Select at least one hospital type.");
-        return;
-      }
-      const pos = await getCurrentLocation();
-      const query = `${selectedSpecialties.join(" OR ")} hospital near me`;
-      const mapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(
-        query
-      )}/@${pos.coords.latitude},${pos.coords.longitude},14z`;
-      window.open(mapsUrl, "_blank");
-    } catch (err) {
-      alert("Failed to get location.");
-    }
-  };
+  if (error) {
+    return (
+      <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+        <div className="flex items-start">
+          <AlertTriangle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
+          <p className="text-red-700">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (loading) return <p>Loading emergency information...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  const contactName =
+    emergencyContact?.name || userProfile?.emergencyContact?.name;
+  const contactPhone =
+    emergencyContact?.phone || userProfile?.emergencyContact?.phone;
 
   return (
-    <div className="bg-white rounded-xl shadow p-6 mt-8 w-full">
-      <h2 className="text-xl font-bold text-red-600 mb-4">
-        🚨 SOS & Hospital Finder
-      </h2>
+    <div className="w-full">
+      {/* Emergency Contact Info */}
+      {contactName && contactPhone && (
+        <div className="flex items-center mb-5 bg-white p-3 rounded-lg shadow-sm">
+          <div className="bg-red-100 rounded-full p-2 mr-3">
+            <Phone className="h-5 w-5 text-red-700" />
+          </div>
+          <div>
+            <p className="text-sm font-medium">{contactName}</p>
+            <p className="text-xs text-gray-500">{contactPhone}</p>
+          </div>
+        </div>
+      )}
 
-      <div className="mb-4">
-        <p className="text-sm mb-2">
-          Pressing the SOS button will send your current location and medical
-          profile QR code to your emergency contact via WhatsApp.
+      {/* SOS Button */}
+      <div className="mb-6">
+        <p className="text-sm mb-3 text-gray-600">
+          Press the SOS button to alert your emergency contact with your current
+          location and medical profile
         </p>
         <button
           onClick={sendSOS}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow"
+          disabled={sending}
+          className={`
+            relative w-full py-4 px-6 rounded-lg 
+            flex items-center justify-center
+            transition-all duration-300
+            ${
+              sending
+                ? "bg-red-400 cursor-not-allowed"
+                : "bg-red-600 hover:bg-red-700 shadow-md hover:shadow-lg"
+            }
+            text-white font-bold
+          `}
         >
-          Send SOS with Medical Profile
+          {sending ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin mr-2" />
+              <span>Sending Emergency Alert...</span>
+            </>
+          ) : (
+            <>
+              <AlertTriangle className="h-5 w-5 mr-2" />
+              <span>SEND SOS ALERT</span>
+            </>
+          )}
         </button>
-      </div>
-
-      <div className="mt-6">
-        <button
-          onClick={() => setDropdownVisible(!dropdownVisible)}
-          className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-        >
-          {dropdownVisible ? "Hide Hospital Filters" : "Find Hospitals Nearby"}
-        </button>
-
-        {dropdownVisible && (
-          <div className="mt-4 bg-gray-100 p-4 rounded">
-            {[
-              "Trauma Center",
-              "Cardiac Hospital",
-              "Stroke Center",
-              "Burn Center",
-              "Pediatric Emergency",
-              "Maternity & Neonatal Emergency",
-            ].map((label) => (
-              <label key={label} className="block mb-2">
-                <input
-                  type="checkbox"
-                  className="mr-2"
-                  value={label}
-                  checked={selectedSpecialties.includes(label)}
-                  onChange={(e) => handleCheckbox(label, e.target.checked)}
-                />
-                {label}
-              </label>
-            ))}
-            <button
-              onClick={findHospitals}
-              className="bg-green-500 hover:bg-green-700 text-white py-2 px-4 mt-4 rounded"
-            >
-              Search Hospitals
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -4,11 +4,29 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { UserCircle } from "lucide-react"; // Optional: user icon
+import { useState } from "react";
+import {
+  UserCircle,
+  Home,
+  AlertTriangle,
+  Activity,
+  ChevronRight,
+  Menu,
+  X,
+  LogOut,
+  Heart,
+  Bell,
+} from "lucide-react";
 
 const navItems = [
   {
+    section: "Dashboard",
+    icon: <Home className="w-5 h-5" />,
+    links: [{ name: "Overview", path: "/patient/dashboard" }],
+  },
+  {
     section: "Emergency Response",
+    icon: <AlertTriangle className="w-5 h-5" />,
     links: [
       {
         name: "Wound Classification",
@@ -23,6 +41,7 @@ const navItems = [
   },
   {
     section: "Remote Monitoring",
+    icon: <Activity className="w-5 h-5" />,
     links: [
       { name: "Vitals Dashboard", path: "/patient/dashboard/monitoring" },
       { name: "Response History", path: "/patient/dashboard/history" },
@@ -34,65 +53,200 @@ export default function PatientDashboardLayout({ children }) {
   const { data: session } = useSession();
   const pathname = usePathname();
   const firstName = session?.user?.name?.split(" ")[0] || "Patient";
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [expandedSection, setExpandedSection] = useState(null);
+
+  const toggleSection = (section) => {
+    setExpandedSection(expandedSection === section ? null : section);
+  };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg p-5 flex flex-col justify-between">
-        {/* Top - Profile */}
-        <div>
-          <h2 className="text-xl font-bold mb-4">Patient Panel</h2>
+    <div className="min-h-screen flex bg-gray-50">
+      {/* Mobile sidebar backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-20 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-          <div className="mb-6">
+      {/* Sidebar */}
+      <aside
+        className={clsx(
+          "fixed top-0 left-0 z-30 h-full w-72 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="h-full flex flex-col">
+          {/* Logo and Close button for mobile */}
+          <div className="flex items-center justify-between p-5 border-b">
+            <div className="flex items-center space-x-2">
+              <Heart className="h-6 w-6 text-blue-600" />
+              <span className="text-xl font-semibold text-blue-800">
+                SwiftAid
+              </span>
+            </div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-1 rounded-full hover:bg-gray-100 md:hidden"
+            >
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
+          </div>
+
+          {/* User Profile */}
+          <div className="p-5 border-b">
             <Link
               href="/patient/profile"
-              className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded"
+              className="flex items-center space-x-3 hover:bg-blue-50 p-3 rounded-xl transition-colors duration-200"
             >
-              <UserCircle className="w-6 h-6 text-blue-500" />
-              <span className="text-sm font-medium text-gray-800">
-                Welcome, {firstName}
-              </span>
+              <div className="bg-blue-100 rounded-full p-2">
+                <UserCircle className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-800">{firstName}</p>
+                <p className="text-xs text-gray-500">View Profile</p>
+              </div>
             </Link>
           </div>
 
           {/* Navigation */}
-          <nav className="space-y-4">
+          <nav className="flex-1 overflow-y-auto py-4">
             {navItems.map((group) => (
-              <div key={group.section}>
-                <h3 className="text-sm text-gray-500 mb-1">{group.section}</h3>
-                <ul className="space-y-1">
-                  {group.links.map((link) => (
-                    <li key={link.path}>
-                      <Link
-                        href={link.path}
-                        className={clsx(
-                          "block px-3 py-2 rounded-md hover:bg-blue-100",
-                          pathname === link.path && "bg-blue-500 text-white"
-                        )}
-                      >
-                        {link.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+              <div key={group.section} className="px-4 mb-4">
+                <button
+                  onClick={() => toggleSection(group.section)}
+                  className="w-full flex items-center justify-between p-2 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="text-blue-600">{group.icon}</div>
+                    <span className="font-medium">{group.section}</span>
+                  </div>
+                  <ChevronRight
+                    className={clsx(
+                      "h-4 w-4 text-gray-500 transition-transform duration-200",
+                      expandedSection === group.section && "transform rotate-90"
+                    )}
+                  />
+                </button>
+
+                {(expandedSection === group.section ||
+                  group.section === "Dashboard") && (
+                  <ul className="mt-1 ml-10 space-y-1">
+                    {group.links.map((link) => (
+                      <li key={link.path}>
+                        <Link
+                          href={link.path}
+                          className={clsx(
+                            "block px-3 py-2 rounded-lg text-sm transition-colors duration-200",
+                            pathname === link.path
+                              ? "bg-blue-100 text-blue-700 font-medium"
+                              : "text-gray-600 hover:bg-gray-100"
+                          )}
+                          onClick={() => setSidebarOpen(false)}
+                        >
+                          {link.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </nav>
-        </div>
 
-        {/* Bottom - Sign Out */}
-        <div>
-          <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="w-full px-3 py-2 bg-red-500 text-white text-sm rounded hover:bg-red-600"
-          >
-            Sign Out
-          </button>
+          {/* Notifications and Sign Out */}
+          <div className="p-5 border-t">
+            <Link
+              href="/patient/notifications"
+              className="flex items-center justify-between p-3 mb-3 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+            >
+              <span>Notifications</span>
+              <div className="flex items-center">
+                <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">
+                  2
+                </span>
+                <Bell className="h-5 w-5 text-gray-500" />
+              </div>
+            </Link>
+
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="w-full flex items-center justify-center space-x-2 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors duration-200"
+            >
+              <LogOut className="h-5 w-5" />
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
       </aside>
 
-      {/* Page Content */}
-      <main className="flex-1 p-6">{children}</main>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+        {/* Top navigation bar */}
+        <header className="bg-white shadow-sm border-b border-gray-200 py-3 px-5 md:px-8">
+          <div className="flex items-center justify-between">
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-md text-gray-500 hover:bg-gray-100 md:hidden focus:outline-none"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+
+            <div className="md:hidden flex items-center">
+              <Heart className="h-5 w-5 text-blue-600 mr-2" />
+              <span className="font-semibold text-blue-800">SwiftAid</span>
+            </div>
+
+            {/* Search bar - visible on larger screens */}
+            <div className="hidden md:block flex-1 max-w-md mx-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full py-2 pl-10 pr-4 text-sm text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
+                />
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* User actions */}
+            <div className="flex items-center space-x-3">
+              <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors duration-200">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50">
+          {/* Content container with max width */}
+          <div className="max-w-7xl mx-auto">{children}</div>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-white border-t border-gray-200 p-4 text-center text-xs text-gray-500">
+          <p>© 2025 SwiftAid. All rights reserved.</p>
+        </footer>
+      </div>
     </div>
   );
 }
