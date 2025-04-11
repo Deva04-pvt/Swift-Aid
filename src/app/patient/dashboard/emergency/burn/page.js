@@ -5,6 +5,21 @@ import * as ort from "onnxruntime-web";
 
 const classLabels = ["Mild Burn", "Moderate Burn", "Severe Burn"];
 
+const treatmentMap = {
+  "Mild Burn": {
+    text: `- Cool the burn with cool water for 10-15 minutes.\n- Apply aloe vera or moisturizing lotion.\n- Use pain relievers like ibuprofen.\n- Cover with a sterile bandage.`,
+    video: "/videos/first.mp4",
+  },
+  "Moderate Burn": {
+    text: `- Cool with water for at least 10 minutes.\n- Do not pop blisters.\n- Apply antibiotic ointment & bandage.\n- Take pain relievers.`,
+    video: "/videos/second.mp4",
+  },
+  "Severe Burn": {
+    text: `- Call emergency services immediately.\n- Do not remove clothing stuck to the burn.\n- Cover with a clean cloth.\n- Elevate burn if possible.`,
+    video: null, // no video for severe burn
+  },
+};
+
 export default function Home() {
   const { data: session } = useSession();
   const [prediction, setPrediction] = useState(null);
@@ -110,6 +125,25 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+    
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    setImageUrl(img.src);
+
+    img.onload = async () => {
+      const inputTensor = await preprocess(img);
+      const session = await ort.InferenceSession.create("/burn_classification_model.onnx");
+      const feeds = { input_image: inputTensor };
+      const results = await session.run(feeds);
+      const output = results[Object.keys(results)[0]].data;
+      const maxIndex = output.indexOf(Math.max(...output));
+
+      setPrediction(classLabels[maxIndex]);
+      setConfidence((output[maxIndex] * 100).toFixed(2));
+    };
   };
 
   return (
@@ -127,9 +161,7 @@ export default function Home() {
       <h1 style={{ color: "#d9534f", fontSize: "2rem" }}>
         🔥 Burn Classification
       </h1>
-      <p
-        style={{ textAlign: "center", maxWidth: "500px", marginBottom: "1rem" }}
-      >
+      <p style={{ textAlign: "center", maxWidth: "500px", marginBottom: "1rem" }}>
         Upload an image of a burn wound to classify its severity into one of the
         following categories:
       </p>
@@ -150,7 +182,6 @@ export default function Home() {
           border: "2px solid #ccc",
           borderRadius: "8px",
           cursor: "pointer",
-          transition: "all 0.2s ease-in-out",
         }}
         onMouseOver={(e) => (e.target.style.borderColor = "#d9534f")}
         onMouseOut={(e) => (e.target.style.borderColor = "#ccc")}
@@ -218,7 +249,7 @@ export default function Home() {
             boxShadow: "0 6px 20px rgba(0, 0, 0, 0.08)",
             textAlign: "center",
             width: "100%",
-            maxWidth: "500px",
+            maxWidth: "600px",
           }}
         >
           <h2 style={{ margin: 0, fontSize: "1.5rem", color: "#28a745" }}>
@@ -227,6 +258,47 @@ export default function Home() {
           <p style={{ fontSize: "1.1rem", marginTop: "0.5rem", color: "#555" }}>
             🧠 Confidence: {confidence}%
           </p>
+
+          <h3 style={{ marginTop: "1.5rem", color: "#d9534f" }}>
+            💊 Treatment Recommendation:
+          </h3>
+          <pre
+            style={{
+              whiteSpace: "pre-wrap",
+              textAlign: "left",
+              padding: "1rem",
+              background: "#f9f9f9",
+              borderRadius: "10px",
+              color: "#333",
+            }}
+          >
+            {treatmentMap[prediction]?.text}
+          </pre>
+
+          {prediction === "Severe Burn" && (
+            <div
+              style={{
+                border: "2px solid red",
+                borderRadius: "10px",
+                padding: "20px",
+                backgroundColor: "#ffe6e6",
+                color: "red",
+                marginTop: "20px",
+              }}
+            >
+              <h2>🚨 SEEK IMMEDIATE MEDICAL CARE 🚨</h2>
+            </div>
+          )}
+
+          {treatmentMap[prediction]?.video && prediction !== "Severe Burn" && (
+            <div style={{ marginTop: "1rem" }}>
+              <h4>🎥 Treatment Video:</h4>
+              <video controls style={{ maxWidth: "100%", borderRadius: "10px" }}>
+                <source src={treatmentMap[prediction].video} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          )}
         </div>
       )}
     </div>
