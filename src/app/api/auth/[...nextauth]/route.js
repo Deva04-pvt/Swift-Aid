@@ -1,11 +1,10 @@
-// app/api/auth/[...nextauth]/route.js
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/models/UserCredentials";
 import bcrypt from "bcryptjs";
 
-const handler = NextAuth({
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -47,7 +46,6 @@ const handler = NextAuth({
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Redirect based on user role
       if (url.includes("/dashboard")) return baseUrl;
       return baseUrl;
     },
@@ -56,9 +54,11 @@ const handler = NextAuth({
     strategy: "jwt",
   },
   pages: {
-    signIn: "/signin", // Optional: custom signin page
+    signIn: "/signin",
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

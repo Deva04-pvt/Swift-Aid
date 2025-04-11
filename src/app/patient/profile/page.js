@@ -3,9 +3,11 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { PencilIcon, CheckIcon, XIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function PatientProfileForm() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState({});
   const [saving, setSaving] = useState(false);
@@ -211,6 +213,7 @@ export default function PatientProfileForm() {
       alert(`Error: ${error.message}`);
     } finally {
       setSaving(false);
+      router.push("/patient/dashboard");
     }
   };
 
