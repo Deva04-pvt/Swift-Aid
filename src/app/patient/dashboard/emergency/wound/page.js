@@ -35,6 +35,40 @@ export default function Home() {
     return new ort.Tensor("float32", input, [1, 224, 224, 3]);
   };
 
+  const saveToHistory = async (imageBase64, prediction, confidence) => {
+    try {
+      console.log('Attempting to save:', {
+        imageLength: imageBase64?.length,
+        prediction,
+        confidence
+      });
+
+      const response = await fetch('/api/wound-history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: imageBase64,
+          prediction,
+          confidence,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || 'Failed to save history');
+      }
+
+      const data = await response.json();
+      console.log('Save successful:', data);
+
+    } catch (error) {
+      console.error('Save failed:', error);
+      throw error;
+    }
+  };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -56,6 +90,10 @@ export default function Home() {
       const maxIndex = output.indexOf(Math.max(...output));
       setPrediction(classLabels[maxIndex]);
       setConfidence((output[maxIndex] * 100).toFixed(2));
+
+      const canvas = canvasRef.current;
+      const imageBase64 = canvas.toDataURL("image/png");
+      await saveToHistory(imageBase64, classLabels[maxIndex], (output[maxIndex] * 100).toFixed(2));
     };
   };
 
