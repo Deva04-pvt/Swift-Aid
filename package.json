@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@cloudinary/url-gen": "^1.21.0",
+    "@vapi-ai/web": "^2.2.5",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.6.0",
     "clsx": "^2.1.1",
