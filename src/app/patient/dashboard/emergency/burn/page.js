@@ -1,13 +1,17 @@
 "use client";
 import { useState, useRef } from "react";
+import { useSession } from "next-auth/react";
 import * as ort from "onnxruntime-web";
 
 const classLabels = ["Mild Burn", "Moderate Burn", "Severe Burn"];
 
 export default function Home() {
+  const { data: session } = useSession();
   const [prediction, setPrediction] = useState(null);
   const [confidence, setConfidence] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const canvasRef = useRef();
 
   const preprocess = async (image) => {
@@ -27,28 +31,85 @@ export default function Home() {
     return new ort.Tensor("float32", input, [1, 224, 224, 3]);
   };
 
+  const saveToHistory = async (imageBase64, prediction, confidence) => {
+    try {
+      console.log('Saving to history:', {
+        imageLength: imageBase64.length,
+        prediction,
+        confidence
+      });
+
+      const response = await fetch('/api/burn-history', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: imageBase64,
+          prediction,
+          confidence,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save history');
+      }
+
+      console.log('History saved successfully:', data);
+    } catch (error) {
+      console.error('Error saving history:', error);
+      setError(error.message);
+    }
+  };
+
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    try {
+      setIsLoading(true);
+      setError(null);
+      const file = e.target.files[0];
+      if (!file) return;
 
-    const img = new Image();
-    img.src = URL.createObjectURL(file);
-    setImageUrl(img.src);
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      reader.onloadend = async () => {
+        const base64Image = reader.result;
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        setImageUrl(img.src);
 
-    img.onload = async () => {
-      const inputTensor = await preprocess(img);
-      const session = await ort.InferenceSession.create(
-        "/burn_classification_model.onnx"
-      );
+        img.onload = async () => {
+          try {
+            const inputTensor = await preprocess(img);
+            const session = await ort.InferenceSession.create(
+              "/burn_classification_model.onnx"
+            );
 
-      const feeds = { input_image: inputTensor };
-      const results = await session.run(feeds);
-      const output = results[Object.keys(results)[0]].data;
-      const maxIndex = output.indexOf(Math.max(...output));
+            const feeds = { input_image: inputTensor };
+            const results = await session.run(feeds);
+            const output = results[Object.keys(results)[0]].data;
+            const maxIndex = output.indexOf(Math.max(...output));
+            const predictionResult = classLabels[maxIndex];
+            const confidenceResult = (output[maxIndex] * 100).toFixed(2);
 
-      setPrediction(classLabels[maxIndex]);
-      setConfidence((output[maxIndex] * 100).toFixed(2));
-    };
+            setPrediction(predictionResult);
+            setConfidence(confidenceResult);
+
+            await saveToHistory(base64Image, predictionResult, confidenceResult);
+          } catch (error) {
+            console.error('Error processing image:', error);
+            setError('Error processing image: ' + error.message);
+          }
+        };
+      };
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setError('Error uploading image: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -116,6 +177,35 @@ export default function Home() {
             objectFit: "cover",
           }}
         />
+      )}
+
+      {isLoading && (
+        <div
+          style={{
+            marginTop: "1rem",
+            color: "#d9534f",
+            fontSize: "1.1rem",
+            textAlign: "center",
+          }}
+        >
+          Processing image...
+        </div>
+      )}
+
+      {error && (
+        <div
+          style={{
+            marginTop: "1rem",
+            color: "#dc3545",
+            fontSize: "1.1rem",
+            textAlign: "center",
+            padding: "1rem",
+            backgroundColor: "#f8d7da",
+            borderRadius: "4px",
+          }}
+        >
+          {error}
+        </div>
       )}
 
       {prediction && (
