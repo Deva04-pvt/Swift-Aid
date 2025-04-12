@@ -130,8 +130,7 @@ export default function PatientDashboardLayout({ children }) {
                   />
                 </button>
 
-                {(expandedSection === group.section ||
-                  group.section === "Dashboard") && (
+                {expandedSection === group.section && (
                   <ul className="mt-1 ml-10 space-y-1">
                     {group.links.map((link) => (
                       <li key={link.path}>
