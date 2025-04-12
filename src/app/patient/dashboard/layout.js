@@ -54,11 +54,6 @@ export default function PatientDashboardLayout({ children }) {
   const pathname = usePathname();
   const firstName = session?.user?.name?.split(" ")[0] || "Patient";
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedSection, setExpandedSection] = useState(null);
-
-  const toggleSection = (section) => {
-    setExpandedSection(expandedSection === section ? null : section);
-  };
 
   return (
     <div className="min-h-screen flex">
@@ -113,43 +108,32 @@ export default function PatientDashboardLayout({ children }) {
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
             {navItems.map((group) => (
-              <div key={group.section} className="px-4 mb-4">
-                <button
-                  onClick={() => toggleSection(group.section)}
-                  className="w-full flex items-center justify-between p-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="text-teal-400">{group.icon}</div>
-                    <span className="font-medium">{group.section}</span>
-                  </div>
-                  <ChevronRight
-                    className={clsx(
-                      "h-4 w-4 text-gray-400 transition-transform duration-200",
-                      expandedSection === group.section && "transform rotate-90"
-                    )}
-                  />
-                </button>
+              <div key={group.section} className="px-4 mb-6">
+                {/* Section Title */}
+                <div className="flex items-center space-x-3 p-2 text-gray-300">
+                  <div className="text-teal-400">{group.icon}</div>
+                  <span className="font-medium">{group.section}</span>
+                </div>
 
-                {expandedSection === group.section && (
-                  <ul className="mt-1 ml-10 space-y-1">
-                    {group.links.map((link) => (
-                      <li key={link.path}>
-                        <Link
-                          href={link.path}
-                          className={clsx(
-                            "block px-3 py-2 rounded-lg text-sm transition-colors duration-200",
-                            pathname === link.path
-                              ? "bg-teal-900/60 text-teal-300 font-medium"
-                              : "text-gray-400 hover:bg-gray-700"
-                          )}
-                          onClick={() => setSidebarOpen(false)}
-                        >
-                          {link.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                {/* Section Links */}
+                <ul className="mt-1 ml-8 space-y-1">
+                  {group.links.map((link) => (
+                    <li key={link.path}>
+                      <Link
+                        href={link.path}
+                        className={clsx(
+                          "block px-3 py-2 rounded-lg text-sm transition-colors duration-200",
+                          pathname === link.path
+                            ? "bg-teal-900/60 text-teal-300 font-medium"
+                            : "text-gray-400 hover:bg-gray-700"
+                        )}
+                        onClick={() => setSidebarOpen(false)}
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </nav>
