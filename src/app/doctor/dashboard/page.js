@@ -135,7 +135,7 @@ export default function DoctorDashboard() {
                     My Patients
                   </h1>
                   <p className="text-gray-300">
-                    Manage and monitor your patients' health information
+                    Manage and monitor your patients health information
                   </p>
                 </div>
               </div>
