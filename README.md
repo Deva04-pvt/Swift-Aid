@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Swift-Aid: AI-Powered Emergency Medical Response Platform
+
+Swift-Aid is a comprehensive healthcare platform that combines artificial intelligence, real-time monitoring, and emergency response capabilities to provide immediate medical assistance and continuous health tracking.
+
+## Key Features
+
+### 1. Emergency Response System
+
+- **AI-Powered Wound Classification**: Instant analysis and first-aid recommendations for various wound types
+- **Burn Assessment**: AI-driven burn severity classification with treatment guidelines
+- **Voice-Based Medical Assistant**: Interactive AI assistant for emergency medical guidance
+- **Smart SOS System**: One-click emergency alert system with:
+  - Real-time location sharing
+  - QR code generation with vital medical information
+  - Automatic emergency contact notification
+  - Integration with Exotel for emergency calls
+
+### 2. Real-Time Health Monitoring
+
+- **Vital Signs Tracking**: Integration with Mi Band 5 for continuous heart rate monitoring
+- **Health Dashboard**: Real-time visualization of vital statistics
+- **MQTT-Based Data Stream**: Live health data transmission and monitoring
+- **Automated Alerts**: Instant notifications for abnormal vital signs
+
+### 3. Patient Care Management
+
+- **Digital Medical Profile**: Comprehensive medical history management
+- **Hospital Locator**: GPS-based nearby hospital search with specialty filtering
+- **Treatment History**: Chronological record of medical assessments and treatments
+- **Secure Data Storage**: End-to-end encrypted medical information storage
+
+### 4. Doctor-Patient Interface
+
+- **Remote Patient Monitoring**: Real-time patient vital monitoring for doctors
+- **Status Tracking**: Patient health status classification and monitoring
+- **Medical History Access**: Secure access to patient records and treatment history
+
+## Technical Stack
+
+- **Frontend & API**: Next.js 14
+- **Database**: MongoDB
+- **Real-time Communication**: MQTT
+- **AI Models**: TensorFlow/ONNX
+- **Image Management**: Cloudinary
+- **Authentication**: NextAuth.js
+- **Emergency Calls**: Exotel API
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Node.js 18+
+npm or yarn
+MongoDB
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/Swift-Aid.git
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Navigate to project directory
+cd Swift-Aid
 
-## Learn More
+# Install dependencies
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+# Set up environment variables
+cp .env.example .env.local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start the development server
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📝 Environment Variables
 
-## Deploy on Vercel
+Create a `.env.local` file with:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+MONGODB_URI=your_mongodb_uri
+NEXTAUTH_SECRET=your_secret
+CLOUDINARY_API_KEY=your_key
+EXOTEL_SID=your_sid
+# ... other variables
+```
