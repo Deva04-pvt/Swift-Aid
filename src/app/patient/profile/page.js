@@ -420,7 +420,7 @@ export default function PatientProfileForm() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-64 bg-gray-900">
         <div className="text-center">
           <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-teal-500 border-r-transparent"></div>
           <p className="mt-4 text-lg text-gray-300">Loading your profile...</p>
@@ -430,7 +430,7 @@ export default function PatientProfileForm() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6 animate-fadeIn">
+    <div className="max-w-4xl mx-auto p-4 md:p-6 animate-fadeIn bg-gray-900">
       {/* Header Section */}
       <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-xl shadow-md border border-gray-700 mb-6">
         <div className="flex items-center">
