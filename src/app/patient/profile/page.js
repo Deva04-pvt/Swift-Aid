@@ -22,6 +22,7 @@ export default function PatientProfileForm() {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState({});
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     dateOfBirth: "",
     gender: "",
@@ -135,6 +136,15 @@ export default function PatientProfileForm() {
       ...prev,
       [field]: !prev[field],
     }));
+
+    // Clear errors for this field when entering edit mode
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
   };
 
   const handleChange = (e) => {
@@ -148,8 +158,26 @@ export default function PatientProfileForm() {
           [key]: value,
         },
       }));
+
+      // Clear error for this field if it exists
+      if (errors[`${section}.${key}`]) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[`${section}.${key}`];
+          return newErrors;
+        });
+      }
     } else {
       setFormData((prev) => ({ ...prev, [id]: value }));
+
+      // Clear error for this field if it exists
+      if (errors[id]) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[id];
+          return newErrors;
+        });
+      }
     }
   };
 
@@ -159,6 +187,15 @@ export default function PatientProfileForm() {
       newArray[index] = value;
       return { ...prev, [field]: newArray };
     });
+
+    // Clear error for this field if it exists
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
   };
 
   const handleAddArrayItem = (field) => {
@@ -181,9 +218,109 @@ export default function PatientProfileForm() {
     });
   };
 
+  // Validate all form fields
+  const validateForm = () => {
+    const newErrors = {};
+    const isFirstTime = !formData._id;
+
+    // Only perform strict validation if this is the first profile creation
+    if (isFirstTime) {
+      // Validate basic fields
+      if (!formData.dateOfBirth)
+        newErrors.dateOfBirth = "Date of birth is required";
+      if (!formData.gender) newErrors.gender = "Gender is required";
+      if (!formData.bloodGroup)
+        newErrors.bloodGroup = "Blood group is required";
+      if (!formData.contactNumber)
+        newErrors.contactNumber = "Contact number is required";
+
+      // Validate address
+      if (!formData.address.street)
+        newErrors["address.street"] = "Street address is required";
+      if (!formData.address.city)
+        newErrors["address.city"] = "City is required";
+      if (!formData.address.state)
+        newErrors["address.state"] = "State is required";
+      if (!formData.address.zip)
+        newErrors["address.zip"] = "ZIP/Postal code is required";
+
+      // Validate emergency contact
+      if (!formData.emergencyContact.name)
+        newErrors["emergencyContact.name"] =
+          "Emergency contact name is required";
+      if (!formData.emergencyContact.phone)
+        newErrors["emergencyContact.phone"] =
+          "Emergency contact number is required";
+      if (!formData.emergencyContact.relation)
+        newErrors["emergencyContact.relation"] = "Relation is required";
+
+      // Check if at least one item in arrays is non-empty
+      const hasMedicalHistory = formData.medicalHistory.some(
+        (item) => item.trim() !== ""
+      );
+      if (!hasMedicalHistory) {
+        newErrors.medicalHistory =
+          "Please add at least one medical history item or enter 'None' if none";
+      }
+
+      const hasAllergies = formData.allergies.some(
+        (item) => item.trim() !== ""
+      );
+      if (!hasAllergies) {
+        newErrors.allergies =
+          "Please add at least one allergy or enter 'None' if none";
+      }
+
+      const hasMedications = formData.currentMedications.some(
+        (item) => item.trim() !== ""
+      );
+      if (!hasMedications) {
+        newErrors.currentMedications =
+          "Please add at least one medication or enter 'None' if none";
+      }
+
+      // Insurance validation
+      if (!formData.insuranceProvider)
+        newErrors.insuranceProvider = "Insurance provider is required";
+      if (!formData.insuranceNumber)
+        newErrors.insuranceNumber = "Insurance number is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!session?.user?.id) return alert("User not logged in");
+
+    // Validate form
+    const isValid = validateForm();
+    if (!isValid) {
+      // Get the number of errors
+      const errorCount = Object.keys(errors).length;
+
+      // Show a user-friendly message
+      alert(
+        `Please fill out all required fields (${errorCount} ${
+          errorCount === 1 ? "field" : "fields"
+        } missing)`
+      );
+
+      // Scroll to the first error
+      setTimeout(() => {
+        const firstErrorField = Object.keys(errors)[0];
+        const element = document.querySelector(
+          `[data-field="${firstErrorField}"]`
+        );
+
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+
+      return;
+    }
 
     try {
       setSaving(true);
@@ -206,6 +343,17 @@ export default function PatientProfileForm() {
         body: JSON.stringify({ ...cleanedData, user: session.user.id }),
       });
 
+      // Check for validation errors from the server
+      if (res.status === 400) {
+        const data = await res.json();
+        if (data.error === "validation_error" && data.fields) {
+          // Server-side validation failed, populate errors
+          setErrors(data.fields);
+          alert("Please complete all required fields");
+          return;
+        }
+      }
+
       const data = await res.json();
 
       if (res.ok) {
@@ -219,10 +367,22 @@ export default function PatientProfileForm() {
         alert(data.message || "Profile saved successfully!");
         router.push("/patient/dashboard");
       } else {
-        throw new Error(data.error || "Failed to save profile");
+        // Handle different types of errors
+        if (data.error === "missing_fields") {
+          alert("Please fill out all required fields");
+        } else {
+          throw new Error(data.error || "Failed to save profile");
+        }
       }
     } catch (error) {
-      alert(`Error: ${error.message}`);
+      // Clearer error messaging
+      if (error.message.includes("required")) {
+        alert("Please fill out all required fields");
+      } else {
+        alert(
+          `Error: ${error.message || "Something went wrong. Please try again."}`
+        );
+      }
     } finally {
       setSaving(false);
     }
@@ -235,11 +395,15 @@ export default function PatientProfileForm() {
       ? formData[id.split(".")[0]][id.split(".")[1]]
       : formData[id];
 
+    // Check if this field has an error
+    const errorKey = id;
+    const hasError = !!errors[errorKey];
+
     return (
-      <div className="mb-4">
+      <div className="mb-4" data-field={id}>
         <div className="flex items-center justify-between mb-1">
           <label className="text-sm font-medium text-gray-300" htmlFor={id}>
-            {label}
+            {label} {!formData._id && <span className="text-red-400">*</span>}
           </label>
           {formData._id && (
             <button
@@ -253,29 +417,42 @@ export default function PatientProfileForm() {
         </div>
 
         {isEditing ? (
-          options ? (
-            <select
-              id={id}
-              value={value}
-              onChange={handleChange}
-              className="w-full p-2 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200"
-            >
-              <option value="">Select</option>
-              {options.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              type={type}
-              id={id}
-              value={value}
-              onChange={handleChange}
-              className="w-full p-2 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200"
-            />
-          )
+          <div>
+            {options ? (
+              <select
+                id={id}
+                value={value}
+                onChange={handleChange}
+                className={`w-full p-2 bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 ${
+                  hasError
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-gray-600 text-gray-200"
+                }`}
+              >
+                <option value="">Select</option>
+                {options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type={type}
+                id={id}
+                value={value}
+                onChange={handleChange}
+                className={`w-full p-2 bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 ${
+                  hasError
+                    ? "border-red-500 ring-1 ring-red-500"
+                    : "border-gray-600 text-gray-200"
+                }`}
+              />
+            )}
+            {hasError && (
+              <p className="text-red-400 text-sm mt-1">{errors[errorKey]}</p>
+            )}
+          </div>
         ) : (
           <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
             <span className={value ? "text-gray-300" : "text-gray-500"}>
@@ -290,11 +467,14 @@ export default function PatientProfileForm() {
   // Render an array field (like medical history, allergies)
   const renderArrayField = (label, field) => {
     const isEditing = editMode[field];
+    const hasError = !!errors[field];
 
     return (
-      <div className="mb-4">
+      <div className="mb-4" data-field={field}>
         <div className="flex items-center justify-between mb-1">
-          <label className="text-sm font-medium text-gray-300">{label}</label>
+          <label className="text-sm font-medium text-gray-300">
+            {label} {!formData._id && <span className="text-red-400">*</span>}
+          </label>
           {formData._id && (
             <button
               type="button"
@@ -316,7 +496,11 @@ export default function PatientProfileForm() {
                   onChange={(e) =>
                     handleArrayChange(field, e.target.value, index)
                   }
-                  className="flex-grow p-2 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200"
+                  className={`flex-grow p-2 bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 ${
+                    hasError
+                      ? "border-red-500 ring-1 ring-red-500"
+                      : "border-gray-600 text-gray-200"
+                  }`}
                   placeholder={`Add ${label.toLowerCase()}`}
                 />
                 {formData[field].length > 1 && (
@@ -339,6 +523,9 @@ export default function PatientProfileForm() {
                 )}
               </div>
             ))}
+            {hasError && (
+              <p className="text-red-400 text-sm mt-1">{errors[field]}</p>
+            )}
           </div>
         ) : (
           <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
@@ -373,7 +560,10 @@ export default function PatientProfileForm() {
             {section === "emergencyContact" && (
               <Phone className="mr-2 h-5 w-5" />
             )}
-            {title}
+            {title}{" "}
+            {!formData._id && (
+              <span className="text-red-400 ml-1 text-sm">*</span>
+            )}
           </h3>
           {formData._id && (
             <button
@@ -388,18 +578,30 @@ export default function PatientProfileForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {fields.map(([key, label]) => (
-            <div key={key} className="mb-2">
+            <div key={key} className="mb-2" data-field={`${section}.${key}`}>
               <label className="text-sm font-medium text-gray-300 mb-1 block">
-                {label}
+                {label}{" "}
+                {!formData._id && <span className="text-red-400">*</span>}
               </label>
               {isEditing ? (
-                <input
-                  type="text"
-                  id={`${section}.${key}`}
-                  value={formData[section][key]}
-                  onChange={handleChange}
-                  className="w-full p-2 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200"
-                />
+                <div>
+                  <input
+                    type="text"
+                    id={`${section}.${key}`}
+                    value={formData[section][key]}
+                    onChange={handleChange}
+                    className={`w-full p-2 bg-gray-700 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200 ${
+                      errors[`${section}.${key}`]
+                        ? "border-red-500 ring-1 ring-red-500"
+                        : "border-gray-600 text-gray-200"
+                    }`}
+                  />
+                  {errors[`${section}.${key}`] && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {errors[`${section}.${key}`]}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <div className="p-3 bg-gray-700 rounded-lg border border-gray-600">
                   <span
@@ -446,14 +648,41 @@ export default function PatientProfileForm() {
             </p>
           </div>
         </div>
+
+        {!formData._id && (
+          <div className="mt-3 bg-teal-900/30 p-2 rounded-lg border border-teal-800 text-sm">
+            <p className="text-teal-300">
+              <span className="text-red-400 mr-1">*</span>
+              All fields are required for first-time setup to ensure proper
+              emergency assistance
+            </p>
+          </div>
+        )}
       </div>
+
+      {/* Error Summary - show if there are multiple errors */}
+      {Object.keys(errors).length > 0 && (
+        <div className="bg-red-900/20 p-4 rounded-lg border-l-4 border-red-600 mb-6">
+          <h4 className="font-semibold text-red-300 mb-2">
+            Please correct the following issues:
+          </h4>
+          <ul className="list-disc ml-5 text-red-400">
+            {Object.values(errors).map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Personal Information */}
         <div className="bg-gray-800 p-5 rounded-xl shadow-sm hover:shadow-md border border-gray-700 transition-all duration-300">
           <h3 className="text-lg font-semibold text-teal-400 mb-4 flex items-center">
             <UserCircle className="mr-2 h-5 w-5" />
-            Personal Information
+            Personal Information{" "}
+            {!formData._id && (
+              <span className="text-red-400 ml-1 text-sm">*</span>
+            )}
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -497,7 +726,10 @@ export default function PatientProfileForm() {
         <div className="bg-gray-800 p-5 rounded-xl shadow-sm hover:shadow-md border border-gray-700 transition-all duration-300">
           <h3 className="text-lg font-semibold text-teal-400 mb-4 flex items-center">
             <Activity className="mr-2 h-5 w-5" />
-            Medical Information
+            Medical Information{" "}
+            {!formData._id && (
+              <span className="text-red-400 ml-1 text-sm">*</span>
+            )}
           </h3>
 
           <div className="space-y-5">
@@ -511,7 +743,10 @@ export default function PatientProfileForm() {
         <div className="bg-gray-800 p-5 rounded-xl shadow-sm hover:shadow-md border border-gray-700 transition-all duration-300">
           <h3 className="text-lg font-semibold text-teal-400 mb-4 flex items-center">
             <Shield className="mr-2 h-5 w-5" />
-            Insurance Details
+            Insurance Details{" "}
+            {!formData._id && (
+              <span className="text-red-400 ml-1 text-sm">*</span>
+            )}
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
