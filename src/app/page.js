@@ -127,16 +127,6 @@ export default function HomePage() {
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </motion.button>
-
-          {session && (
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <LogoutButton className="px-8 py-4 border-2 border-blue-600 text-blue-600 hover:text-white hover:bg-blue-600 text-lg font-medium rounded-xl transition-all duration-300" />
-            </motion.div>
-          )}
         </motion.div>
 
         {/* Status badge */}

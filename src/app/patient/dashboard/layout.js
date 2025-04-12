@@ -155,29 +155,13 @@ export default function PatientDashboardLayout({ children }) {
             ))}
           </nav>
 
-          {/* Notifications and Sign Out */}
-          <div className="p-5 border-t">
-            <Link
-              href="/patient/notifications"
-              className="flex items-center justify-between p-3 mb-3 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-            >
-              <span>Notifications</span>
-              <div className="flex items-center">
-                <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center mr-2">
-                  2
-                </span>
-                <Bell className="h-5 w-5 text-gray-500" />
-              </div>
-            </Link>
-
-            <button
-              onClick={() => signOut({ callbackUrl: "/" })}
-              className="w-full flex items-center justify-center space-x-2 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors duration-200"
-            >
-              <LogOut className="h-5 w-5" />
-              <span>Sign Out</span>
-            </button>
-          </div>
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="w-full flex items-center justify-center space-x-2 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors duration-200"
+          >
+            <LogOut className="h-5 w-5" />
+            <span>Sign Out</span>
+          </button>
         </div>
       </aside>
 
@@ -197,41 +181,6 @@ export default function PatientDashboardLayout({ children }) {
             <div className="md:hidden flex items-center">
               <Heart className="h-5 w-5 text-blue-600 mr-2" />
               <span className="font-semibold text-blue-800">SwiftAid</span>
-            </div>
-
-            {/* Search bar - visible on larger screens */}
-            <div className="hidden md:block flex-1 max-w-md mx-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="w-full py-2 pl-10 pr-4 text-sm text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
-                />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 text-gray-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* User actions */}
-            <div className="flex items-center space-x-3">
-              <button className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors duration-200">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 h-3 w-3 bg-red-500 rounded-full border-2 border-white"></span>
-              </button>
             </div>
           </div>
         </header>

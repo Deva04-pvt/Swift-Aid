@@ -251,27 +251,6 @@ export default function SignUp() {
             </Link>
           </p>
         </motion.div>
-
-        {/* Terms of Service */}
-        <motion.div
-          variants={itemVariants}
-          className="text-center text-gray-500 text-xs mt-4"
-        >
-          By creating an account, you agree to our{" "}
-          <a
-            href="#"
-            className="text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            Terms of Service
-          </a>{" "}
-          and{" "}
-          <a
-            href="#"
-            className="text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            Privacy Policy
-          </a>
-        </motion.div>
       </motion.div>
     </div>
   );

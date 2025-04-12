@@ -43,29 +43,6 @@ export default async function PatientDashboardHome() {
             <HospitalSearch />
           </div>
 
-          {/* Quick Actions */}
-          <div className="bg-white p-6 rounded-xl shadow-sm mb-6 transition-all duration-300 hover:shadow-md">
-            <h2 className="text-xl font-bold text-blue-700 mb-4">
-              Quick Actions
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {quickActions.map((action, index) => (
-                <Link
-                  href={action.path}
-                  key={index}
-                  className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors duration-200"
-                >
-                  <div className={`p-3 rounded-full mb-2 ${action.bgColor}`}>
-                    {action.icon}
-                  </div>
-                  <span className="text-sm text-center text-gray-700">
-                    {action.name}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
           {/* Health Tips */}
           <div className="bg-white p-6 rounded-xl shadow-sm transition-all duration-300 hover:shadow-md">
             <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center">
@@ -94,30 +71,6 @@ export default async function PatientDashboardHome() {
               Emergency SOS
             </h2>
             {userId && <SOSSection userId={userId} />}
-          </div>
-
-          {/* Upcoming Appointments */}
-          <div className="bg-white p-6 rounded-xl shadow-sm mb-6 transition-all duration-300 hover:shadow-md">
-            <h2 className="text-xl font-bold text-blue-700 mb-4 flex items-center">
-              <Calendar className="mr-2 h-5 w-5" />
-              Upcoming Appointments
-            </h2>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-start space-x-3 mb-2">
-                <Clock className="h-5 w-5 text-blue-500 mt-1" />
-                <div>
-                  <p className="font-medium text-gray-800">No appointments</p>
-                  <p className="text-sm text-gray-600">
-                    Your schedule is clear
-                  </p>
-                </div>
-              </div>
-              <Link href="/patient/dashboard/appointments">
-                <button className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200">
-                  Schedule Appointment
-                </button>
-              </Link>
-            </div>
           </div>
 
           {/* Health Stats Summary */}
