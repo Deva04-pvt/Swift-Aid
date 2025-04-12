@@ -2,6 +2,64 @@
 
 Swift-Aid is a comprehensive healthcare platform that combines artificial intelligence, real-time monitoring, and emergency response capabilities to provide immediate medical assistance and continuous health tracking.
 
+## Project Structure
+
+````bash
+Swift-Aid/
+├── .next/                 # Next.js build output (generated)
+├── node_modules/          # Dependencies (generated)
+├── public/                # Static files
+├── src/                   # Source code
+│   ├── app/               # Next.js app directory
+│   │   ├── api/           # API routes
+│   │   │   ├── auth/      # Authentication endpoints
+│   │   │   ├── burn-history/    # Burn history API
+│   │   │   ├── emergency-contact/ # Emergency contact API
+│   │   │   ├── patients/  # Patients API
+│   │   │   ├── patient/   # Patient-specific API
+│   │   │   └── wound-history/    # Wound history API
+│   │   ├── doctor/        # Doctor-facing pages
+│   │   │   └── dashboard/ # Doctor dashboard
+│   │   ├── patient/       # Patient-facing pages
+│   │   │   ├── dashboard/ # Patient dashboard
+│   │   │   │   ├── emergency/    # Emergency response features
+│   │   │   │   │   ├── burn/     # Burn classification
+│   │   │   │   │   ├── voice/    # Voice assistance
+│   │   │   │   │   └── wound/    # Wound classification
+│   │   │   │   ├── history/      # Medical history
+│   │   │   │   └── monitoring/   # Vitals monitoring
+│   │   │   └── profile/    # Patient profile management
+│   │   ├── signin/         # Authentication pages
+│   │   ├── signup/         # Registration pages
+│   │   ├── unauthorized/   # Access denied page
+│   │   ├── globals.css     # Global CSS
+│   │   ├── layout.js       # Root layout
+│   │   └── page.js         # Home page
+│   ├── components/         # Reusable components
+│   │   ├── auth/           # Authentication components
+│   │   ├── doctor/         # Doctor-specific components
+│   │   └── patient/        # Patient-specific components
+│   │       ├── HospitalSearch.js    # Hospital locator component
+│   │       ├── RealTimeVitals.js    # Vitals monitoring component
+│   │       └── SOSSection.js        # Emergency SOS component
+│   ├── lib/                # Utility libraries
+│   │   ├── cloudinary.js   # Cloudinary integration
+│   │   └── mongodb.js      # MongoDB connection
+│   └── models/             # Database models
+│       ├── BurnHistory.js  # Burn analysis history schema
+│       ├── UserCredentials.js # User authentication schema
+│       ├── UserProfile.js  # User profile schema
+│       └── WoundHistory.js # Wound analysis history schema
+├── .env.example           # Example environment variables
+├── .eslintrc.json         # ESLint configuration
+├── .gitignore             # Git ignore rules
+├── eslint.config.mjs      # ESLint configuration
+├── next.config.js         # Next.js configuration
+├── package.json           # Project dependencies
+├── postcss.config.js      # PostCSS configuration
+├── README.md              # Project documentation
+└── tailwind.config.js     # Tailwind CSS configuration
+
 ## Key Features
 
 ### 1. Emergency Response System
@@ -53,7 +111,7 @@ Swift-Aid is a comprehensive healthcare platform that combines artificial intell
 Node.js 18+
 npm or yarn
 MongoDB
-```
+````
 
 ### Installation
 
