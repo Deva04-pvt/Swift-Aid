@@ -395,7 +395,7 @@ const Agent = ({ userName, userId, type, questions }) => {
                     <>
                       <Mic className="w-16 h-16 mb-4 text-teal-400" />
                       <p className="text-lg text-center">
-                        I'm listening! Please speak now...
+                        Im listening! Please speak now...
                       </p>
                     </>
                   ) : (

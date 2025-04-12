@@ -192,7 +192,7 @@ export default function MedicalHistory() {
               No history found
             </h3>
             <p className="text-gray-400">
-              You haven't analyzed any{" "}
+              You havent analyzed any{" "}
               {activeTab === "burn" ? "burns" : "wounds"} yet.
             </p>
             <button
