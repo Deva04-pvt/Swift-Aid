@@ -77,6 +77,8 @@ const woundInfo = {
   },
 };
 
+const CONFIDENCE_THRESHOLD = 50; // Set a confidence threshold (e.g., 50%)
+
 export default function WoundClassification() {
   const [prediction, setPrediction] = useState(null);
   const [confidence, setConfidence] = useState(null);
@@ -159,16 +161,24 @@ export default function WoundClassification() {
           const output = results[Object.keys(results)[0]].data;
 
           const maxIndex = output.indexOf(Math.max(...output));
-          setPrediction(classLabels[maxIndex]);
-          setConfidence((output[maxIndex] * 100).toFixed(2));
+          const maxConfidence = output[maxIndex] * 100;
 
-          const canvas = canvasRef.current;
-          const imageBase64 = canvas.toDataURL("image/png");
-          await saveToHistory(
-            imageBase64,
-            classLabels[maxIndex],
-            (output[maxIndex] * 100).toFixed(2)
-          );
+          if (maxConfidence < CONFIDENCE_THRESHOLD) {
+            setPrediction("Uncertain");
+            setConfidence(maxConfidence.toFixed(2));
+            setError("The uploaded image could not be confidently classified.");
+          } else {
+            setPrediction(classLabels[maxIndex]);
+            setConfidence(maxConfidence.toFixed(2));
+
+            const canvas = canvasRef.current;
+            const imageBase64 = canvas.toDataURL("image/png");
+            await saveToHistory(
+              imageBase64,
+              classLabels[maxIndex],
+              maxConfidence.toFixed(2)
+            );
+          }
         } catch (error) {
           console.error("Error processing image:", error);
           setError("Error processing image: " + error.message);
@@ -371,10 +381,10 @@ export default function WoundClassification() {
             className="p-4 rounded-lg mb-6 flex items-center"
             style={{
               backgroundColor: `${
-                woundInfo[prediction].severity === "severe"
+                woundInfo[prediction]?.severity === "severe"
                   ? "rgba(239, 68, 68, 0.1)"
-                  : woundInfo[prediction].severity === "moderate" ||
-                    woundInfo[prediction].severity === "moderate to severe"
+                  : woundInfo[prediction]?.severity === "moderate" ||
+                    woundInfo[prediction]?.severity === "moderate to severe"
                   ? "rgba(245, 158, 11, 0.1)"
                   : "rgba(16, 185, 129, 0.1)"
               }`,
@@ -384,32 +394,33 @@ export default function WoundClassification() {
               className="h-12 w-12 rounded-full mr-4 flex items-center justify-center"
               style={{
                 backgroundColor: `${
-                  woundInfo[prediction].severity === "severe"
+                  woundInfo[prediction]?.severity === "severe"
                     ? "rgba(239, 68, 68, 0.2)"
-                    : woundInfo[prediction].severity === "moderate" ||
-                      woundInfo[prediction].severity === "moderate to severe"
+                    : woundInfo[prediction]?.severity === "moderate" ||
+                      woundInfo[prediction]?.severity === "moderate to severe"
                     ? "rgba(245, 158, 11, 0.2)"
                     : "rgba(16, 185, 129, 0.2)"
                 }`,
               }}
             >
-              {getSeverityIcon(woundInfo[prediction].severity)}
+              {getSeverityIcon(woundInfo[prediction]?.severity)}
             </div>
             <div>
               <h3
                 className="text-lg font-bold mb-1"
-                style={{ color: woundInfo[prediction].color }}
+                style={{ color: woundInfo[prediction]?.color }}
               >
                 {prediction}
               </h3>
               <p className="text-gray-300 text-sm">
-                {woundInfo[prediction].description}
+                {woundInfo[prediction]?.description ||
+                  "No description available."}
               </p>
             </div>
           </div>
 
           {/* Severity Alert for Severe Wounds */}
-          {woundInfo[prediction].severity === "severe" && (
+          {woundInfo[prediction]?.severity === "severe" && (
             <div className="bg-red-900/30 border-2 border-red-600 rounded-lg p-4 mb-6 text-center animate-pulse">
               <AlertTriangle className="h-8 w-8 text-red-400 mx-auto mb-2" />
               <h3 className="text-xl font-bold text-red-400">
@@ -422,25 +433,30 @@ export default function WoundClassification() {
           )}
 
           {/* Treatment Recommendations */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-200 mb-3 flex items-center">
-              <span className="mr-2">💊</span> First Aid Recommendations
-            </h3>
-            <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
-              {woundInfo[prediction].treatment
-                .split(", ")
-                .map((step, index) => (
-                  <div key={index} className="flex items-start mb-2 last:mb-0">
-                    <div className="h-5 w-5 rounded-full bg-teal-900/60 flex items-center justify-center mr-3 mt-0.5 border border-teal-800">
-                      <span className="text-teal-300 text-xs font-bold">
-                        {index + 1}
-                      </span>
+          {woundInfo[prediction]?.treatment && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-200 mb-3 flex items-center">
+                <span className="mr-2">💊</span> First Aid Recommendations
+              </h3>
+              <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
+                {woundInfo[prediction].treatment
+                  .split(", ")
+                  .map((step, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start mb-2 last:mb-0"
+                    >
+                      <div className="h-5 w-5 rounded-full bg-teal-900/60 flex items-center justify-center mr-3 mt-0.5 border border-teal-800">
+                        <span className="text-teal-300 text-xs font-bold">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <p className="text-gray-300">{step}</p>
                     </div>
-                    <p className="text-gray-300">{step}</p>
-                  </div>
-                ))}
+                  ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Disclaimer */}
           <div className="mt-6 bg-yellow-900/20 p-3 rounded-lg text-sm text-yellow-300 border-l-4 border-yellow-600">
