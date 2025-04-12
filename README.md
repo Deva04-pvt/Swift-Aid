@@ -59,7 +59,7 @@ Swift-Aid/
 ├── postcss.config.js      # PostCSS configuration
 ├── README.md              # Project documentation
 └── tailwind.config.js     # Tailwind CSS configuration
-
+```
 ## Key Features
 
 ### 1. Emergency Response System
