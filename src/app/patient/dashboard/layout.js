@@ -61,7 +61,7 @@ export default function PatientDashboardLayout({ children }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-900">
+    <div className="min-h-screen flex">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -73,13 +73,13 @@ export default function PatientDashboardLayout({ children }) {
       {/* Sidebar */}
       <aside
         className={clsx(
-          "fixed top-0 left-0 z-30 h-full w-72 bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed md:sticky top-0 left-0 z-30 h-screen w-72 bg-gray-800 shadow-lg transition-transform duration-300 ease-in-out flex-shrink-0 flex",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}
       >
-        <div className="h-full flex flex-col">
+        <div className="flex flex-col w-full overflow-hidden">
           {/* Logo and Close button for mobile */}
-          <div className="flex items-center justify-between p-5 border-b border-gray-700">
+          <div className="flex-shrink-0 flex items-center justify-between p-5 border-b border-gray-700">
             <div className="flex items-center space-x-2">
               <Heart className="h-6 w-6 text-teal-400" />
               <span className="text-xl font-semibold text-teal-300">
@@ -95,7 +95,7 @@ export default function PatientDashboardLayout({ children }) {
           </div>
 
           {/* User Profile */}
-          <div className="p-5 border-b border-gray-700">
+          <div className="flex-shrink-0 p-5 border-b border-gray-700">
             <Link
               href="/patient/profile"
               className="flex items-center space-x-3 hover:bg-gray-700 p-3 rounded-xl transition-colors duration-200"
@@ -111,7 +111,7 @@ export default function PatientDashboardLayout({ children }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto py-4">
+          <nav className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
             {navItems.map((group) => (
               <div key={group.section} className="px-4 mb-4">
                 <button
@@ -155,20 +155,23 @@ export default function PatientDashboardLayout({ children }) {
             ))}
           </nav>
 
-          <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="w-full flex items-center justify-center space-x-2 py-3 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-xl transition-colors duration-200 mx-4 mb-4"
-          >
-            <LogOut className="h-5 w-5" />
-            <span>Sign Out</span>
-          </button>
+          {/* Sign Out button */}
+          <div className="flex-shrink-0 p-4 border-t border-gray-700 bg-gray-800">
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="w-full flex items-center justify-center space-x-2 py-3 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-xl transition-colors duration-200"
+            >
+              <LogOut className="h-5 w-5" />
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen w-full overflow-hidden">
         {/* Top navigation bar */}
-        <header className="bg-gray-800 shadow-md border-b border-gray-700 py-3 px-5 md:px-8">
+        <header className="bg-gray-800 shadow-md border-b border-gray-700 py-3 px-5 md:px-8 flex-shrink-0">
           <div className="flex items-center justify-between">
             {/* Mobile menu button */}
             <button
@@ -186,13 +189,14 @@ export default function PatientDashboardLayout({ children }) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-900">
-          {/* Content container with max width */}
-          <div className="max-w-7xl mx-auto">{children}</div>
+        <main className="flex-1 overflow-y-auto bg-gray-900">
+          <div className="max-w-7xl mx-auto p-4 md:p-8 min-h-full">
+            {children}
+          </div>
         </main>
 
         {/* Footer */}
-        <footer className="bg-gray-800 border-t border-gray-700 p-4 text-center text-xs text-gray-400">
+        <footer className="bg-gray-800 border-t border-gray-700 p-4 text-center text-xs text-gray-400 w-full flex-shrink-0">
           <p>© 2025 SwiftAid. All rights reserved.</p>
         </footer>
       </div>
