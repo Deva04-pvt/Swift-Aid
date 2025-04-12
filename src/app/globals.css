@@ -2,45 +2,85 @@
 
 /* Base animations for UI elements */
 @keyframes blob {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0px, 0px) scale(1); }
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideInFromBottom {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes ripple {
-  0% { box-shadow: 0 0 0 0px rgba(20, 184, 166, 0.3); }
-  100% { box-shadow: 0 0 0 20px rgba(20, 184, 166, 0); }
+  0% {
+    box-shadow: 0 0 0 0px rgba(20, 184, 166, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(20, 184, 166, 0);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 /* Apply animations to classes */
@@ -113,15 +153,15 @@
   --color-warning: 245 158 11; /* amber-500 */
   --color-danger: 239 68 68; /* red-500 */
   --color-info: 59 130 246; /* blue-500 */
-  
+
   --color-background: 17 24 39; /* gray-900 */
   --color-background-2: 31 41 55; /* gray-800 */
   --color-background-3: 55 65 81; /* gray-700 */
-  
+
   --color-text-primary: 243 244 246; /* gray-100 */
   --color-text-secondary: 209 213 219; /* gray-300 */
   --color-text-tertiary: 156 163 175; /* gray-400 */
-  
+
   --color-border: 75 85 99; /* gray-600 */
   --color-border-light: 107 114 128; /* gray-500 */
 }
@@ -207,17 +247,16 @@ body {
 .card-hover-effect:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3),
-              0 8px 10px -6px rgba(0, 0, 0, 0.2),
-              0 0 0 1px rgba(20, 184, 166, 0.1);
+    0 8px 10px -6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(20, 184, 166, 0.1);
 }
 
 /* Loading skeleton for dark theme */
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgb(55 65 81), /* gray-700 */
-    rgb(75 85 99), /* gray-600 */
-    rgb(55 65 81) /* gray-700 */
+    rgb(55 65 81),
+    /* gray-700 */ rgb(75 85 99),
+    /* gray-600 */ rgb(55 65 81) /* gray-700 */
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
@@ -240,24 +279,5 @@ body {
   body {
     background-color: rgb(17 24 39); /* Maintain dark mode */
     color: rgb(243 244 246); /* Maintain dark mode text */
-  }
-}
-
-@layer utilities {
-  .scrollbar-thin {
-    scrollbar-width: thin;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: #1f2937;
-  }
-  
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: #4b5563;
-    border-radius: 3px;
   }
 }
