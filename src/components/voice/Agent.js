@@ -99,7 +99,6 @@ const Agent = ({ userName, userId, type, questions }) => {
 
   // Render a beautiful animated avatar using CSS instead of images
   const renderAvatar = () => {
-    // Colors based on avatar type
     const colors = type === "emergency" 
       ? { primary: "#ef4444", secondary: "#fee2e2", border: "#fecaca" }  // Red theme
       : { primary: "#3b82f6", secondary: "#dbeafe", border: "#bfdbfe" }; // Blue theme
@@ -316,12 +315,12 @@ const Agent = ({ userName, userId, type, questions }) => {
                   {callStatus === "ACTIVE" ? (
                     <>
                       <Mic className="w-16 h-16 mb-4 text-blue-400" />
-                      <p className="text-lg text-center">I'm listening! Please speak now...</p>
+                      <p className="text-lg text-center">Im listening! Please speak now...</p>
                     </>
                   ) : (
                     <>
                       <Bot className="w-16 h-16 mb-4 text-gray-400" />
-                      <p className="text-lg text-center">Press "Start Conversation" to begin</p>
+                      <p className="text-lg text-center">Press Start Conversation to begin</p>
                       {type === "emergency" && (
                         <p className="text-sm text-center mt-2 text-red-500">
                           For medical emergencies, please also call your local emergency number
