@@ -104,6 +104,22 @@ Swift-Aid/
 - **Authentication**: NextAuth.js
 - **Emergency Calls**: Exotel API
 
+## Architecture Diagrams
+
+Swift-Aid's architecture is designed to provide real-time emergency response capabilities and continuous health monitoring.
+
+### System Architecture
+
+![System Architecture](diagrams/system_arch.jpg)
+
+### MQTT Architecture for Real-time Monitoring
+
+![MQTT Architecture](diagrams/mqtt-arch.png)
+
+### Assistant Workflow
+
+![Assistant Workflow](diagrams/assistant-workflow.jpg)
+
 ## Getting Started
 
 ### Prerequisites
