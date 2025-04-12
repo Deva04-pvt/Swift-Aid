@@ -206,34 +206,34 @@ export default function BurnClassification() {
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-6 animate-fadeIn">
       {/* Header */}
-      <div className="bg-gradient-to-r from-red-50 to-white p-6 rounded-xl shadow-sm mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2 flex items-center">
-          <span className="text-red-500 mr-2">🔥</span> Burn Classification
+      <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-6 rounded-xl shadow-md border border-gray-700 mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-100 mb-2 flex items-center">
+          <span className="text-red-400 mr-2">🔥</span> Burn Classification
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-300">
           Upload an image of a burn wound to classify its severity and get first
           aid recommendations
         </p>
       </div>
 
       {/* Upload Section */}
-      <div className="bg-white p-6 rounded-xl shadow-sm mb-6 transition-all duration-300 hover:shadow-md">
+      <div className="bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700 mb-6 transition-all duration-300 hover:shadow-lg">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">
+          <h2 className="text-lg font-semibold text-gray-200 mb-2">
             Classification Categories:
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-500">
-              <p className="font-medium text-green-700">Mild Burn</p>
-              <p className="text-sm text-green-600">First-degree</p>
+            <div className="bg-green-900/30 p-3 rounded-lg border-l-4 border-green-500">
+              <p className="font-medium text-green-400">Mild Burn</p>
+              <p className="text-sm text-green-500">First-degree</p>
             </div>
-            <div className="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-500">
-              <p className="font-medium text-yellow-700">Moderate Burn</p>
-              <p className="text-sm text-yellow-600">Second-degree</p>
+            <div className="bg-yellow-900/30 p-3 rounded-lg border-l-4 border-yellow-500">
+              <p className="font-medium text-yellow-400">Moderate Burn</p>
+              <p className="text-sm text-yellow-500">Second-degree</p>
             </div>
-            <div className="bg-red-50 p-3 rounded-lg border-l-4 border-red-500">
-              <p className="font-medium text-red-700">Severe Burn</p>
-              <p className="text-sm text-red-600">Third-degree or worse</p>
+            <div className="bg-red-900/30 p-3 rounded-lg border-l-4 border-red-500">
+              <p className="font-medium text-red-400">Severe Burn</p>
+              <p className="text-sm text-red-500">Third-degree or worse</p>
             </div>
           </div>
         </div>
@@ -245,8 +245,8 @@ export default function BurnClassification() {
             transition-all duration-300 cursor-pointer
             ${
               dragActive
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
+                ? "border-teal-500 bg-teal-900/20"
+                : "border-gray-600 hover:border-teal-500 hover:bg-gray-700/50"
             }
           `}
           onDragEnter={handleDrag}
@@ -255,11 +255,11 @@ export default function BurnClassification() {
           onDrop={handleDrop}
           onClick={() => fileInputRef.current.click()}
         >
-          <Upload className="h-12 w-12 text-blue-500 mb-4" />
-          <p className="text-gray-700 font-medium mb-2 text-center">
+          <Upload className="h-12 w-12 text-teal-400 mb-4" />
+          <p className="text-gray-200 font-medium mb-2 text-center">
             Drag & Drop or Click to Upload
           </p>
-          <p className="text-gray-500 text-sm text-center">
+          <p className="text-gray-400 text-sm text-center">
             Supported formats: JPG, PNG, WEBP
           </p>
           <input
@@ -281,10 +281,10 @@ export default function BurnClassification() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="bg-white p-6 rounded-xl shadow-sm mb-6 text-center">
-          <Loader className="h-12 w-12 animate-spin mx-auto text-blue-500 mb-4" />
-          <p className="text-gray-700">Analyzing burn image...</p>
-          <p className="text-gray-500 text-sm mt-2">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700 mb-6 text-center">
+          <Loader className="h-12 w-12 animate-spin mx-auto text-teal-400 mb-4" />
+          <p className="text-gray-200">Analyzing burn image...</p>
+          <p className="text-gray-400 text-sm mt-2">
             This may take a few moments
           </p>
         </div>
@@ -292,28 +292,28 @@ export default function BurnClassification() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 p-5 rounded-xl shadow-sm mb-6 flex items-start">
-          <AlertCircle className="h-5 w-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
+        <div className="bg-red-900/20 p-5 rounded-xl shadow-md border-l-4 border-red-600 mb-6 flex items-start">
+          <AlertCircle className="h-5 w-5 text-red-400 mr-3 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-medium text-red-800 mb-1">
+            <h3 className="font-medium text-red-300 mb-1">
               Error Processing Image
             </h3>
-            <p className="text-red-700 text-sm">{error}</p>
+            <p className="text-red-400 text-sm">{error}</p>
           </div>
         </div>
       )}
 
       {/* Uploaded Image */}
       {imageUrl && !isLoading && (
-        <div className="bg-white p-6 rounded-xl shadow-sm mb-6 transition-all duration-300 hover:shadow-md">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700 mb-6 transition-all duration-300 hover:shadow-lg">
+          <h2 className="text-lg font-semibold text-gray-200 mb-4">
             Uploaded Image
           </h2>
           <div className="flex justify-center">
             <img
               src={imageUrl}
               alt="Uploaded burn"
-              className="max-w-full max-h-[300px] rounded-lg shadow-sm object-contain"
+              className="max-w-full max-h-[300px] rounded-lg shadow-md object-contain"
             />
           </div>
         </div>
@@ -321,15 +321,15 @@ export default function BurnClassification() {
 
       {/* Results Section */}
       {prediction && !isLoading && (
-        <div className="bg-white p-6 rounded-xl shadow-sm mb-6 transition-all duration-300 hover:shadow-md">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-md border border-gray-700 mb-6 transition-all duration-300 hover:shadow-lg">
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center">
-              <CheckCircle className="h-6 w-6 text-green-500 mr-2" />
-              <h2 className="text-xl font-bold text-gray-800">
+              <CheckCircle className="h-6 w-6 text-teal-400 mr-2" />
+              <h2 className="text-xl font-bold text-gray-200">
                 Classification Result
               </h2>
             </div>
-            <div className="bg-blue-100 text-blue-800 py-1 px-3 rounded-full text-sm font-medium">
+            <div className="bg-teal-900/50 text-teal-300 py-1 px-3 rounded-full text-sm font-medium border border-teal-800">
               {confidence}% confidence
             </div>
           </div>
@@ -337,11 +337,25 @@ export default function BurnClassification() {
           {/* Prediction Display */}
           <div
             className={`p-4 rounded-lg mb-6 flex items-center`}
-            style={{ backgroundColor: `${treatmentMap[prediction].color}15` }}
+            style={{
+              backgroundColor:
+                prediction === "Mild Burn"
+                  ? "rgba(16, 185, 129, 0.1)"
+                  : prediction === "Moderate Burn"
+                  ? "rgba(245, 158, 11, 0.1)"
+                  : "rgba(239, 68, 68, 0.1)",
+            }}
           >
             <div
               className="h-12 w-12 rounded-full mr-4 flex items-center justify-center"
-              style={{ backgroundColor: `${treatmentMap[prediction].color}30` }}
+              style={{
+                backgroundColor:
+                  prediction === "Mild Burn"
+                    ? "rgba(16, 185, 129, 0.2)"
+                    : prediction === "Moderate Burn"
+                    ? "rgba(245, 158, 11, 0.2)"
+                    : "rgba(239, 68, 68, 0.2)",
+              }}
             >
               <span className="text-2xl">
                 {prediction === "Mild Burn"
@@ -354,11 +368,18 @@ export default function BurnClassification() {
             <div>
               <h3
                 className="text-lg font-bold mb-1"
-                style={{ color: treatmentMap[prediction].color }}
+                style={{
+                  color:
+                    prediction === "Mild Burn"
+                      ? "#34d399"
+                      : prediction === "Moderate Burn"
+                      ? "#fbbf24"
+                      : "#f87171",
+                }}
               >
                 {prediction}
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-300 text-sm">
                 {prediction === "Mild Burn"
                   ? "First-degree burn affecting the outer layer of skin"
                   : prediction === "Moderate Burn"
@@ -370,12 +391,12 @@ export default function BurnClassification() {
 
           {/* Emergency Alert for Severe Burns */}
           {prediction === "Severe Burn" && (
-            <div className="bg-red-50 border-2 border-red-500 rounded-lg p-4 mb-6 text-center animate-pulse">
-              <AlertTriangle className="h-8 w-8 text-red-600 mx-auto mb-2" />
-              <h3 className="text-xl font-bold text-red-700">
+            <div className="bg-red-900/30 border-2 border-red-600 rounded-lg p-4 mb-6 text-center animate-pulse">
+              <AlertTriangle className="h-8 w-8 text-red-400 mx-auto mb-2" />
+              <h3 className="text-xl font-bold text-red-400">
                 MEDICAL EMERGENCY
               </h3>
-              <p className="text-red-600">
+              <p className="text-red-300">
                 Seek immediate professional medical attention for severe burns
               </p>
             </div>
@@ -383,18 +404,18 @@ export default function BurnClassification() {
 
           {/* Treatment Recommendations */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+            <h3 className="text-lg font-semibold text-gray-200 mb-3 flex items-center">
               <span className="mr-2">💊</span> First Aid Recommendations
             </h3>
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
               {treatmentMap[prediction].text.split("\n").map((line, index) => (
                 <div key={index} className="flex items-start mb-2 last:mb-0">
-                  <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center mr-3 mt-0.5">
-                    <span className="text-blue-700 text-xs font-bold">
+                  <div className="h-5 w-5 rounded-full bg-teal-900/60 flex items-center justify-center mr-3 mt-0.5 border border-teal-800">
+                    <span className="text-teal-300 text-xs font-bold">
                       {index + 1}
                     </span>
                   </div>
-                  <p className="text-gray-700">{line.substring(2)}</p>
+                  <p className="text-gray-300">{line.substring(2)}</p>
                 </div>
               ))}
             </div>
@@ -403,11 +424,11 @@ export default function BurnClassification() {
           {/* Treatment Video */}
           {treatmentMap[prediction]?.video && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                <Video className="h-5 w-5 mr-2" /> Treatment Video
+              <h3 className="text-lg font-semibold text-gray-200 mb-3 flex items-center">
+                <Video className="h-5 w-5 mr-2 text-teal-400" /> Treatment Video
               </h3>
-              <div className="rounded-lg overflow-hidden shadow-sm">
-                <video controls className="w-full">
+              <div className="rounded-lg overflow-hidden shadow-md border border-gray-700">
+                <video controls className="w-full bg-black">
                   <source
                     src={treatmentMap[prediction].video}
                     type="video/mp4"
@@ -419,7 +440,7 @@ export default function BurnClassification() {
           )}
 
           {/* Disclaimer */}
-          <div className="mt-6 bg-yellow-50 p-3 rounded-lg text-sm text-yellow-800">
+          <div className="mt-6 bg-yellow-900/20 p-3 rounded-lg text-sm text-yellow-300 border-l-4 border-yellow-600">
             <p className="font-medium">Important Note:</p>
             <p>
               This AI assessment is not a substitute for professional medical

@@ -11,7 +11,7 @@ const VitalTile = ({
   unit,
   min,
   max,
-  color = "#3b82f6",
+  color = "#14b8a6", // Default to teal-500
 }) => {
   const numValue = isNaN(parseFloat(value)) ? min : parseFloat(value);
   const percentage = Math.min(
@@ -26,15 +26,15 @@ const VitalTile = ({
     : circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center">
+    <div className="bg-gray-800 p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col items-center border border-gray-700">
       <div className="flex items-center justify-center mb-3">
         <div className="text-2xl mr-2">{icon}</div>
-        <h3 className="text-sm font-medium text-gray-700">{title}</h3>
+        <h3 className="text-sm font-medium text-gray-200">{title}</h3>
       </div>
 
       <div className="relative w-36 h-36 flex items-center justify-center">
         {/* Background decoration */}
-        <div className="absolute inset-0 bg-gray-50 rounded-full opacity-30"></div>
+        <div className="absolute inset-0 bg-gray-700 rounded-full opacity-30"></div>
 
         {/* SVG Gauge */}
         <svg
@@ -47,7 +47,7 @@ const VitalTile = ({
             cy="50"
             r={radius}
             fill="transparent"
-            stroke="#e5e7eb"
+            stroke="#374151" // gray-700
             strokeWidth="8" // Thicker stroke
             strokeLinecap="round"
           />
@@ -83,9 +83,9 @@ const VitalTile = ({
 
         {/* Value display */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-          <div className="text-2xl font-bold text-gray-800">
+          <div className="text-2xl font-bold text-gray-100">
             {value}
-            <span className="text-sm font-normal ml-1 text-gray-600">
+            <span className="text-sm font-normal ml-1 text-gray-400">
               {unit}
             </span>
           </div>
@@ -94,8 +94,8 @@ const VitalTile = ({
 
       {/* Min and max labels */}
       <div className="w-full flex justify-between mt-3 px-2">
-        <span className="text-xs font-medium text-gray-500">{min}</span>
-        <span className="text-xs font-medium text-gray-500">{max}</span>
+        <span className="text-xs font-medium text-gray-400">{min}</span>
+        <span className="text-xs font-medium text-gray-400">{max}</span>
       </div>
     </div>
   );
@@ -176,15 +176,15 @@ export default function RealTimeVitals({ userId }) {
 
   if (error) {
     return (
-      <div className="p-6 bg-white rounded-xl shadow-sm">
-        <div className="flex items-center text-red-600 mb-4">
+      <div className="p-6 bg-gray-800 rounded-xl shadow-sm border border-gray-700">
+        <div className="flex items-center text-red-400 mb-4">
           <AlertCircle className="h-6 w-6 mr-2" />
           <h2 className="text-xl font-bold">Connection Error</h2>
         </div>
-        <p className="text-gray-700">{error}</p>
+        <p className="text-gray-300">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="mt-4 px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg transition-colors"
         >
           Retry Connection
         </button>
@@ -194,9 +194,9 @@ export default function RealTimeVitals({ userId }) {
 
   if (!connected) {
     return (
-      <div className="p-8 text-center bg-white rounded-xl shadow-sm">
-        <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent"></div>
-        <p className="mt-4 text-gray-600">
+      <div className="p-8 text-center bg-gray-800 rounded-xl shadow-sm border border-gray-700">
+        <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-teal-500 border-r-transparent"></div>
+        <p className="mt-4 text-gray-300">
           Connecting to vital monitoring system...
         </p>
       </div>
@@ -205,9 +205,9 @@ export default function RealTimeVitals({ userId }) {
 
   if (!vitals) {
     return (
-      <div className="p-8 text-center bg-white rounded-xl shadow-sm">
-        <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent"></div>
-        <p className="mt-4 text-gray-600">
+      <div className="p-8 text-center bg-gray-800 rounded-xl shadow-sm border border-gray-700">
+        <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-teal-500 border-r-transparent"></div>
+        <p className="mt-4 text-gray-300">
           Retrieving your vital signs data...
         </p>
       </div>
@@ -215,8 +215,8 @@ export default function RealTimeVitals({ userId }) {
   }
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-sm transition-all duration-300 hover:shadow-md">
-      <h2 className="text-2xl font-bold text-blue-700 mb-6 flex items-center">
+    <div className="p-6 bg-gray-800 rounded-xl shadow-sm transition-all duration-300 hover:shadow-md border border-gray-700">
+      <h2 className="text-2xl font-bold text-teal-400 mb-6 flex items-center">
         <Activity className="h-6 w-6 mr-2" />
         Live Vitals Monitoring
       </h2>
@@ -265,20 +265,20 @@ export default function RealTimeVitals({ userId }) {
           unit=""
           min={90}
           max={180}
-          color="#3b82f6" // Blue
+          color="#0ea5e9" // Sky blue
         />
 
         {/* Last Updated Tile */}
-        <div className="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-center">
+        <div className="bg-gray-800 p-5 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-center border border-gray-700">
           <div className="flex items-center justify-center mb-3">
             <div className="text-2xl mr-2">⏰</div>
-            <h3 className="text-sm font-medium text-gray-700">Last Updated</h3>
+            <h3 className="text-sm font-medium text-gray-200">Last Updated</h3>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg text-center">
-            <div className="text-xl font-medium text-gray-800">
+          <div className="bg-gray-700 p-4 rounded-lg text-center">
+            <div className="text-xl font-medium text-gray-200">
               {new Date(vitals.timestamp).toLocaleTimeString()}
             </div>
-            <div className="text-sm text-gray-500 mt-1">
+            <div className="text-sm text-gray-400 mt-1">
               {new Date(vitals.timestamp).toLocaleDateString()}
             </div>
           </div>

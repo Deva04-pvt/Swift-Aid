@@ -61,11 +61,11 @@ export default function PatientDashboardLayout({ children }) {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-gray-900">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-20 md:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -73,39 +73,39 @@ export default function PatientDashboardLayout({ children }) {
       {/* Sidebar */}
       <aside
         className={clsx(
-          "fixed top-0 left-0 z-30 h-full w-72 bg-white shadow-lg transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0",
+          "fixed top-0 left-0 z-30 h-full w-72 bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="h-full flex flex-col">
           {/* Logo and Close button for mobile */}
-          <div className="flex items-center justify-between p-5 border-b">
+          <div className="flex items-center justify-between p-5 border-b border-gray-700">
             <div className="flex items-center space-x-2">
-              <Heart className="h-6 w-6 text-blue-600" />
-              <span className="text-xl font-semibold text-blue-800">
+              <Heart className="h-6 w-6 text-teal-400" />
+              <span className="text-xl font-semibold text-teal-300">
                 SwiftAid
               </span>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-1 rounded-full hover:bg-gray-100 md:hidden"
+              className="p-1 rounded-full hover:bg-gray-700 md:hidden"
             >
-              <X className="h-5 w-5 text-gray-500" />
+              <X className="h-5 w-5 text-gray-300" />
             </button>
           </div>
 
           {/* User Profile */}
-          <div className="p-5 border-b">
+          <div className="p-5 border-b border-gray-700">
             <Link
               href="/patient/profile"
-              className="flex items-center space-x-3 hover:bg-blue-50 p-3 rounded-xl transition-colors duration-200"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-3 rounded-xl transition-colors duration-200"
             >
-              <div className="bg-blue-100 rounded-full p-2">
-                <UserCircle className="w-6 h-6 text-blue-600" />
+              <div className="bg-gray-700 rounded-full p-2">
+                <UserCircle className="w-6 h-6 text-teal-400" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-800">{firstName}</p>
-                <p className="text-xs text-gray-500">View Profile</p>
+                <p className="text-sm font-medium text-gray-200">{firstName}</p>
+                <p className="text-xs text-gray-400">View Profile</p>
               </div>
             </Link>
           </div>
@@ -116,15 +116,15 @@ export default function PatientDashboardLayout({ children }) {
               <div key={group.section} className="px-4 mb-4">
                 <button
                   onClick={() => toggleSection(group.section)}
-                  className="w-full flex items-center justify-between p-2 text-gray-700 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                  className="w-full flex items-center justify-between p-2 text-gray-300 hover:bg-gray-700 rounded-lg transition-colors duration-200"
                 >
                   <div className="flex items-center space-x-3">
-                    <div className="text-blue-600">{group.icon}</div>
+                    <div className="text-teal-400">{group.icon}</div>
                     <span className="font-medium">{group.section}</span>
                   </div>
                   <ChevronRight
                     className={clsx(
-                      "h-4 w-4 text-gray-500 transition-transform duration-200",
+                      "h-4 w-4 text-gray-400 transition-transform duration-200",
                       expandedSection === group.section && "transform rotate-90"
                     )}
                   />
@@ -140,8 +140,8 @@ export default function PatientDashboardLayout({ children }) {
                           className={clsx(
                             "block px-3 py-2 rounded-lg text-sm transition-colors duration-200",
                             pathname === link.path
-                              ? "bg-blue-100 text-blue-700 font-medium"
-                              : "text-gray-600 hover:bg-gray-100"
+                              ? "bg-teal-900/60 text-teal-300 font-medium"
+                              : "text-gray-400 hover:bg-gray-700"
                           )}
                           onClick={() => setSidebarOpen(false)}
                         >
@@ -157,7 +157,7 @@ export default function PatientDashboardLayout({ children }) {
 
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="w-full flex items-center justify-center space-x-2 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors duration-200"
+            className="w-full flex items-center justify-center space-x-2 py-3 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-xl transition-colors duration-200 mx-4 mb-4"
           >
             <LogOut className="h-5 w-5" />
             <span>Sign Out</span>
@@ -168,31 +168,31 @@ export default function PatientDashboardLayout({ children }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Top navigation bar */}
-        <header className="bg-white shadow-sm border-b border-gray-200 py-3 px-5 md:px-8">
+        <header className="bg-gray-800 shadow-md border-b border-gray-700 py-3 px-5 md:px-8">
           <div className="flex items-center justify-between">
             {/* Mobile menu button */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-md text-gray-500 hover:bg-gray-100 md:hidden focus:outline-none"
+              className="p-2 rounded-md text-gray-300 hover:bg-gray-700 md:hidden focus:outline-none"
             >
               <Menu className="h-6 w-6" />
             </button>
 
             <div className="md:hidden flex items-center">
-              <Heart className="h-5 w-5 text-blue-600 mr-2" />
-              <span className="font-semibold text-blue-800">SwiftAid</span>
+              <Heart className="h-5 w-5 text-teal-400 mr-2" />
+              <span className="font-semibold text-teal-300">SwiftAid</span>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-900">
           {/* Content container with max width */}
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 p-4 text-center text-xs text-gray-500">
+        <footer className="bg-gray-800 border-t border-gray-700 p-4 text-center text-xs text-gray-400">
           <p>© 2025 SwiftAid. All rights reserved.</p>
         </footer>
       </div>

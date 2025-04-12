@@ -152,18 +152,18 @@ export default function SOSSection({ userId }) {
   if (loading) {
     return (
       <div className="text-center p-4">
-        <Loader2 className="h-8 w-8 animate-spin mx-auto text-red-500" />
-        <p className="mt-2 text-gray-600">Loading emergency information...</p>
+        <Loader2 className="h-8 w-8 animate-spin mx-auto text-red-400" />
+        <p className="mt-2 text-gray-300">Loading emergency information...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+      <div className="bg-red-900/20 p-4 rounded-lg border-l-4 border-red-600">
         <div className="flex items-start">
-          <AlertTriangle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
-          <p className="text-red-700">{error}</p>
+          <AlertTriangle className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
+          <p className="text-red-300">{error}</p>
         </div>
       </div>
     );
@@ -178,20 +178,20 @@ export default function SOSSection({ userId }) {
     <div className="w-full">
       {/* Emergency Contact Info */}
       {contactName && contactPhone && (
-        <div className="flex items-center mb-5 bg-white p-3 rounded-lg shadow-sm">
-          <div className="bg-red-100 rounded-full p-2 mr-3">
-            <Phone className="h-5 w-5 text-red-700" />
+        <div className="flex items-center mb-5 bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-700">
+          <div className="bg-red-900/30 rounded-full p-2 mr-3">
+            <Phone className="h-5 w-5 text-red-400" />
           </div>
           <div>
-            <p className="text-sm font-medium">{contactName}</p>
-            <p className="text-xs text-gray-500">{contactPhone}</p>
+            <p className="text-sm font-medium text-gray-200">{contactName}</p>
+            <p className="text-xs text-gray-400">{contactPhone}</p>
           </div>
         </div>
       )}
 
       {/* SOS Button */}
       <div className="mb-6">
-        <p className="text-sm mb-3 text-gray-600">
+        <p className="text-sm mb-3 text-gray-300">
           Press the SOS button to alert your emergency contact with your current
           location and medical profile
         </p>
@@ -204,7 +204,7 @@ export default function SOSSection({ userId }) {
             transition-all duration-300
             ${
               sending
-                ? "bg-red-400 cursor-not-allowed"
+                ? "bg-red-700 cursor-not-allowed"
                 : "bg-red-600 hover:bg-red-700 shadow-md hover:shadow-lg"
             }
             text-white font-bold

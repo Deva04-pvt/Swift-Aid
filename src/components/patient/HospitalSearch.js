@@ -98,7 +98,7 @@ export default function HospitalSearch() {
   return (
     <div className="w-full mx-auto">
       <div className="mb-5">
-        <h3 className="text-lg font-medium text-gray-700 mb-3">
+        <h3 className="text-lg font-medium text-gray-200 mb-3">
           Select hospital types you are looking for:
         </h3>
 
@@ -111,16 +111,16 @@ export default function HospitalSearch() {
                 cursor-pointer p-3 rounded-lg transition-all duration-300
                 ${
                   selectedTypes.includes(type.id)
-                    ? "bg-blue-50 border-2 border-blue-500 shadow-sm"
-                    : "bg-gray-50 border border-gray-200 hover:border-blue-300"
+                    ? "bg-teal-900/30 border-2 border-teal-500 shadow-sm"
+                    : "bg-gray-700 border border-gray-600 hover:border-teal-500"
                 }
               `}
             >
               <div className="flex items-center">
                 <div className="text-2xl mr-3">{type.icon}</div>
                 <div>
-                  <h4 className="font-medium text-gray-800">{type.name}</h4>
-                  <p className="text-xs text-gray-500">{type.description}</p>
+                  <h4 className="font-medium text-gray-200">{type.name}</h4>
+                  <p className="text-xs text-gray-400">{type.description}</p>
                 </div>
               </div>
             </div>
@@ -135,8 +135,8 @@ export default function HospitalSearch() {
             py-3 px-6 rounded-lg transition-all duration-300
             ${
               isLoading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 shadow hover:shadow-md"
+                ? "bg-teal-700 cursor-not-allowed"
+                : "bg-gradient-to-r from-teal-600 to-cyan-700 hover:from-teal-500 hover:to-cyan-600 shadow hover:shadow-md"
             } 
             text-white font-medium
           `}
@@ -157,14 +157,14 @@ export default function HospitalSearch() {
         </button>
 
         {status && (
-          <div className="mt-4 p-3 bg-red-50 border-l-4 border-red-500 rounded-md flex items-start">
-            <AlertCircle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
-            <p className="text-red-700 text-sm">{status}</p>
+          <div className="mt-4 p-3 bg-red-900/20 border-l-4 border-red-600 rounded-md flex items-start">
+            <AlertCircle className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
+            <p className="text-red-300 text-sm">{status}</p>
           </div>
         )}
 
-        <div className="mt-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-md">
-          <p className="text-sm text-blue-700">
+        <div className="mt-4 p-3 bg-teal-900/20 border-l-4 border-teal-600 rounded-md">
+          <p className="text-sm text-teal-300">
             <strong>Note:</strong> This will open Google Maps to show nearby
             hospitals matching your selected criteria.
           </p>
