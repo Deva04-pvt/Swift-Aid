@@ -4,7 +4,7 @@ Swift-Aid is a comprehensive healthcare platform that combines artificial intell
 
 ## Project Structure
 
-````bash
+```bash
 Swift-Aid/
 ├── .next/                 # Next.js build output (generated)
 ├── node_modules/          # Dependencies (generated)
@@ -60,6 +60,7 @@ Swift-Aid/
 ├── README.md              # Project documentation
 └── tailwind.config.js     # Tailwind CSS configuration
 ```
+
 ## Key Features
 
 ### 1. Emergency Response System
@@ -111,7 +112,7 @@ Swift-Aid/
 Node.js 18+
 npm or yarn
 MongoDB
-````
+```
 
 ### Installation
 
